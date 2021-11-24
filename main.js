@@ -164,7 +164,7 @@ class wave{
 
           enemie_restant_a_spawner -= nb_enemie_a_spawn;
 
-          let y_ = -100;
+          let y_ = -300;
           let x_ = Math.floor(Math.random() * (cnv.width-500));
 
           for(let i = 0;i<nb_enemie_a_spawn;i++){
@@ -174,7 +174,7 @@ class wave{
             
             game.current_level.current_wave.enemie_en_vie++;
             
-            enemie_1.shoot_enemi();
+            //enemie_1.shoot_enemi();
             List_Enemy.append(enemie_1);
 
           }
@@ -201,14 +201,13 @@ class Enemy{
     this.projectile = projectile_;
     this.size = size;
     this.proj_type = pjt;
+    this.id_iterator = 0;
   }
 
   draw_collision(){
     context.beginPath();
     context.lineWidth = 2;
     context.strokeStyle = "grey";
-
-
     context.moveTo(this.face_collision[0].x,this.face_collision[0].y);
     context.lineTo(this.face_collision[1].x,this.face_collision[1].y);
 
@@ -239,6 +238,7 @@ class Enemy{
   }
 
   shoot_enemi(){
+    
     switch(this.proj_type){
       case 1 :
         enemie_shoot_simple(this,this.projectile);
@@ -251,7 +251,7 @@ class Enemy{
       break;
       case 4 :
         enemie_shoot_arc_cercle(this,this.projectile,1);
-        enemie_shoot_arc_cercle(this,this.projectile,-1);
+        //enemie_shoot_arc_cercle(this,this.projectile,-1);
       break;
       case 5 :
         enemie_shoot_arc_cercle(this,this.projectile,-1);
@@ -259,6 +259,15 @@ class Enemy{
 
     }
     
+  }
+
+  iteration_shoot(){
+    this.id_iterator += 15
+
+    if(this.id_iterator >=this.projectile.frequence){
+      this.id_iterator = 0;
+      this.shoot_enemi();
+    }
   }
 }
 class decors{
@@ -276,117 +285,61 @@ class decors{
 
 function enemie_shoot_simple(enemie,projec){
   let proj_cp = projec;
-
-  let shoot_interval = setInterval(
-    function(){
-      if(enemie.vie <= 0){
-        clearInterval(shoot_interval);
-        shoot_interval = null;
-      }
-      else{
-
-        let proj = new projectile(enemie.x,enemie.y,proj_cp.vx,proj_cp.vy,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
-        List_projectile_Enemy.append(proj);
-      }
-    } 
-  ,proj_cp.frequence
-  ); 
+  let proj = new projectile(enemie.x,enemie.y,proj_cp.vx,proj_cp.vy,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
+  List_projectile_Enemy.append(proj);
 }
 
 function enemie_shoot_double(enemie,projec){
   let proj_cp = projec;
-
-  let shoot_interval = setInterval(
-    function(){
-      if(enemie.vie <= 0){
-        clearInterval(shoot_interval);
-        shoot_interval = null;
-      }
-      else{
-
-        let proj_1 = new projectile(enemie.x-(100*enemie.size),enemie.y,proj_cp.vx,proj_cp.vy,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
-        let proj_2 = new projectile(enemie.x+(100*enemie.size),enemie.y,proj_cp.vx,proj_cp.vy,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
-        List_projectile_Enemy.append(proj_1);
-        List_projectile_Enemy.append(proj_2);
-      }
-    } 
-  ,proj_cp.frequence
-  ); 
+  let proj_1 = new projectile(enemie.x-(100*enemie.size),enemie.y,proj_cp.vx,proj_cp.vy,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
+  let proj_2 = new projectile(enemie.x+(100*enemie.size),enemie.y,proj_cp.vx,proj_cp.vy,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
+  List_projectile_Enemy.append(proj_1);
+  List_projectile_Enemy.append(proj_2);
 }
 
 function enemie_shoot_triple(enemie,projec){
   let proj_cp = projec;
-
-  let shoot_interval = setInterval(
-    function(){
-      if(enemie.vie <= 0){
-        clearInterval(shoot_interval);
-        shoot_interval = null;
-      }
-      else{
-
-        let proj_1 = new projectile(enemie.x-(150*enemie.size),enemie.y,proj_cp.vx,proj_cp.vy,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
-        let proj_2 = new projectile(enemie.x,enemie.y+(100*enemie.size),proj_cp.vx,proj_cp.vy,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
-        let proj_3 = new projectile(enemie.x+(150*enemie.size),enemie.y,proj_cp.vx,proj_cp.vy,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
-        List_projectile_Enemy.append(proj_1);
-        List_projectile_Enemy.append(proj_2);
-        List_projectile_Enemy.append(proj_3);
-      }
-    } 
-  ,proj_cp.frequence
-  ); 
+  let proj_1 = new projectile(enemie.x-(150*enemie.size),enemie.y,proj_cp.vx,proj_cp.vy,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
+  let proj_2 = new projectile(enemie.x,enemie.y+(100*enemie.size),proj_cp.vx,proj_cp.vy,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
+  let proj_3 = new projectile(enemie.x+(150*enemie.size),enemie.y,proj_cp.vx,proj_cp.vy,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
+  List_projectile_Enemy.append(proj_1);
+  List_projectile_Enemy.append(proj_2);
+  List_projectile_Enemy.append(proj_3);
 }
 
 function enemie_shoot_arc_cercle(enemie,projec,sens){
+  console.log("prout");
   let proj_cp = projec;
-
-  let shoot_interval = setInterval(
+  let nb_a_shooter = 0;
+  let angle = 0;
+  let vitesse = projec.vy;
+  let shoot_in_circle = setInterval(  
     function(){
-      if(enemie.vie <= 0){
-        clearInterval(shoot_interval);
-        shoot_interval = null;
+      if(nb_a_shooter>=15 || enemie.vie <= 0){
+        clearInterval(shoot_in_circle);
+        shoot_in_circle = null;
       }
       else{
-        let angle;
-        let nb_a_shooter = 0;
-
-        if(sens == -1){
-          angle = 0;
-        }
-        else{
-          angle = 0;
-        }
-        
-
-        
-        let vitesse = proj_cp.vy*sens;
-        let vx_ = vitesse*Math.cos(angle);
+        angle+=0.20;
+        let vx_ = vitesse*Math.cos(angle*sens);
         let vy_ = vitesse*Math.sin(angle);
-        let shoot_in_circle = setInterval(
-          
-          function(){
-            if(nb_a_shooter>=8 || enemie.vie <= 0){
-              clearInterval(shoot_in_circle);
-              shoot_in_circle = null;
-            }
-            else{
-              angle+=0.33;
-              vx_ = vitesse*Math.cos(angle*sens);
-              vy_ = vitesse*Math.sin(angle);
-              nb_a_shooter++;
-              let proj_1 = new projectile(enemie.x+50,enemie.y+50,vx_,vy_,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
-              List_projectile_Enemy.append(proj_1);
-              
-            }
-          }
-        ,100);
+        nb_a_shooter++;
+        let proj_1 = new projectile(enemie.x+50,enemie.y+50,vx_,vy_,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
+        List_projectile_Enemy.append(proj_1);
+        
       }
-    } 
-  ,proj_cp.frequence
-  ); 
+    }
+  ,100); 
 }
 
+function iteration_enemi_shoot(liste){
+  let current = liste.get_head();
 
+  while(current){
+    current.element.iteration_shoot();
+    current = current.next;
+  }
+}
 
 class Player{
   constructor(x,y,vie){
@@ -450,6 +403,7 @@ function LinkedListFactory() {
     }
     let currentNode = head;
     if (position === 0) {
+      head = null;
       head = currentNode.next;
     } else {
       let index = 0;
@@ -459,13 +413,16 @@ function LinkedListFactory() {
         currentNode = currentNode.next;
       }
       previousNode.next = currentNode.next;
+      currentNode = null;
+      
     }
     length--;
-    return currentNode.element;
+    //return currentNode.element;
   }
   function remove(element) {
+    
     const elementIndex = indexOf(element);
-    return removeAt(elementIndex);
+    removeAt(elementIndex);
   }
   function toString() {
     let result = "";
@@ -488,20 +445,20 @@ const List_projectile_joueur = new LinkedListFactory();
 const List_projectile_Enemy = new LinkedListFactory();
 const List_Enemy = new LinkedListFactory();
 
-let projectile_1_enemie = new projectile(0,0,0,35,'./sprites/beams_green.png',20,1500,1);
-let projectile_2_enemie = new projectile(0,0,0,40,'./sprites/beams_red.png',40,1000,1);
-let projectile_3_enemie = new projectile(0,0,0,35,'./sprites/beams_blue_ball.png',50,2000,2);
-let projectile_4_enemie = new projectile(0,0,0,30,'./sprites/beams_red.png',100,4000,2);
-let projectile_5_enemie = new projectile(0,0,0,30,'./sprites/beams_blue.png',15,5000,1.5);
+let projectile_1_enemie = new projectile(0,0,0,35,'./sprites/beams_green.png',20,1111,1);
+let projectile_2_enemie = new projectile(0,0,0,40,'./sprites/beams_red.png',40,1111,1);
+let projectile_3_enemie = new projectile(0,0,0,35,'./sprites/beams_blue_ball.png',50,2222,2);
+let projectile_4_enemie = new projectile(0,0,0,30,'./sprites/beams_red.png',100,3333,2);
+let projectile_5_enemie = new projectile(0,0,0,30,'./sprites/beams_blue.png',15,2222,1.5);
 
 let projectile_1_joueur = new projectile(0,0,0,-30,'./sprites/beams_blue.png',15,250,1.5);
 let projectile_2_joueur = new projectile(0,0,0,-55,'./sprites/beams_red.png',50,600,1);
 let projectile_3_joueur = new projectile(0,0,0,-20,'./sprites/beams_blue.png',20,200,1);
 
-let enemie_1 = new Enemy(0,0,0,0,2,'Normal',50,'./sprites/Enemy_n_2.png',projectile_1_enemie,0.1,2);
+let enemie_1 = new Enemy(0,0,0,0,2,'Normal',50,'./sprites/Enemy_n_2.png',projectile_1_enemie,0.1,1);
 let enemie_2 = new Enemy(0,0,0,0,4,'Normal',20,'./sprites/Enemy_n_1.png',projectile_2_enemie,0.1,1);
 let enemie_3 = new Enemy(0,0,0,0,3,'Normal',200,'./sprites/Enemy_n_1.png',projectile_3_enemie,0.2,1);
-let enemie_4 = new Enemy(0,0,0,0,1.5,'Normal',400,'./sprites/Enemy_n_2.png',projectile_4_enemie,0.3,3);
+let enemie_4 = new Enemy(0,0,0,0,1.5,'Normal',400,'./sprites/Enemy_n_2.png',projectile_4_enemie,0.3,1);
 let enemie_5 = new Enemy(0,0,0,0,1.5,'Normal',400,'./sprites/Enemy_n_2.png',projectile_5_enemie,0.3,4);
 
 let nombre_enemie = 4;
@@ -558,6 +515,7 @@ function test_vie(liste,element){
     game.current_level.current_wave.enemie_mort++;
     //console.log("En vie : ",Enemis_Vivant,"Mort : ",Enemis_mort,"Total : ", Total_enemis);
     liste.remove(element);
+    
   }
 }
 
@@ -619,6 +577,7 @@ function update_pos_projectiles(liste){
   
     if(current.element.y < -100 || current.element.y > cnv.height || current.element.x < -150 || current.element.x > cnv.width){
       liste.remove(current.element);
+      //current= null;
       break;
     }
     current = current.next;
@@ -646,6 +605,7 @@ function update_pos_enemy_normaux(liste){
       game.current_level.current_wave.enemie_en_vie--;
       game.current_level.current_wave.enemie_mort++;
       liste.remove(current_a_détruire.element);
+      //current_a_détruire = null;
     }
   }
 }
@@ -661,6 +621,7 @@ function test_collision_projectiles(liste_colliders,liste_collided){
         current_Le.element.vie -= current_Lpj.element.degats;
         test_vie(liste_collided,current_Le.element);
         liste_colliders.remove(current_Lpj.element);
+        //current_Lpj = null;
       }
       current_Le = current_Le.next;
     }
@@ -679,6 +640,7 @@ function test_collision_joueur(liste){
       Joueur.vie -= current_Lpe.element.degats;
       joueur_test_vie();
       liste.remove(current_Lpe.element);
+      //current_Lpe = null;
     }
 
     current_Lpe = current_Lpe.next;
@@ -688,7 +650,7 @@ function test_collision_joueur(liste){
 for(let i = 0;i<nb_poussière;i++){
   let poussiere = [0,0,0];
   if(i%2 == 0){
-    poussiere = [Math.round(Math.random() * cnv.width),Math.round(Math.random() * cnv.height),Math.round(Math.random() * 3+1)];
+    poussiere = [Math.round(Math.random() * cnv.width),Math.round(Math.random() * cnv.height),Math.round(Math.random() * 3)+0.25];
   }
   else{
     poussiere = [Math.round(Math.random() * cnv.width),Math.round(Math.random() * cnv.height),Math.round(Math.random() * 10+5)];
@@ -697,6 +659,7 @@ for(let i = 0;i<nb_poussière;i++){
 }
 
 function draw(){
+  context.clearRect(-10000,-1000,3000,3000)
   let size_ = game.current_level.size;
   context.drawImage(Fond_space_1_i1,coord_fond_1[0],coord_fond_1[1],Fond_space_1_i1.width*size_,Fond_space_1_i1.height*size_);
   context.drawImage(Fond_space_1_i1,coord_fond_2[0],coord_fond_2[1],Fond_space_1_i1.width*size_,Fond_space_1_i1.height*size_);
@@ -733,6 +696,7 @@ function draw(){
   affiche_projectile(List_projectile_joueur);
   affiche_projectile(List_projectile_Enemy);
   affiche_enemy(List_Enemy);
+  iteration_enemi_shoot(List_Enemy);
 
   context.drawImage(Vaisseau_joueur,Joueur.x-54,Joueur.y,Vaisseau_joueur.width*0.15,Vaisseau_joueur.height*0.15);  
   context.beginPath();
@@ -762,8 +726,8 @@ function upgrade_pos(){
     coord_fond_2[1] = -Fond_space_1_i1.height*2;
   }
   else{
-    coord_fond_1[1] +=0.20;
-    coord_fond_2[1] +=0.20;
+    coord_fond_1[1] +=0.15;
+    coord_fond_2[1] +=0.15;
   }
 
   for(let i = 0;i<poussiere_tab.length;i++){
@@ -1094,10 +1058,9 @@ function PlayerShooting(){
 function update() {
   draw();
   upgrade_pos();
-  //List_Enemy.test_collision_1(List_projectile_joueur,List_Enemy);
-  //List_projectile_Enemy.test_collision_joueur(Joueur.face_collision);
-
 }
+
+
 
 function update2(){
   test_collision_projectiles(List_projectile_joueur,List_Enemy);
@@ -1106,11 +1069,11 @@ function update2(){
 
 function start_game(){
   Fond_space_1_i1.src = game.current_level.img;
-  coord_fond_1 = [-200,-Fond_space_1_i1.height*2+cnv.height];
-  coord_fond_2 = [-200,-Fond_space_1_i1.height*4+cnv.height];
-  let setinterval_global_update_id = setInterval(update, 25);
+  coord_fond_1 = [-300,-Fond_space_1_i1.height*2+cnv.height];
+  coord_fond_2 = [-300,-Fond_space_1_i1.height*4+cnv.height];
+  let setinterval_global_update_id = setInterval(update, 15);
   let setinterval_global_update_2_id = setInterval(update2, 50);
-  setInterval(current,5000);
+  setInterval(current,500);
 }
 
 function current(){
@@ -1118,7 +1081,7 @@ function current(){
   let e_m = game.current_level.current_wave.enemie_mort;
   let e_v = game.current_level.current_wave.enemie_en_vie;
 
-  console.log(e_t,e_m,e_v);
+  
   if(!game.current_level.current_wave.HasSpawn){
     game.current_level.current_wave.create_wave();
     game.current_level.current_wave.HasSpawn = true;
@@ -1137,15 +1100,14 @@ function current(){
     coord_fond_1 = [-200,-Fond_space_1_i1.height*2+cnv.height];
     coord_fond_2 = [-200,-Fond_space_1_i1.height*4+cnv.height];
   }
-
-
-
-  
 }
+
+
+
 
 let wave1_1 = new wave(1,[enemie_5],1);
 let wave2_1 = new wave(10,[enemie_1,enemie_2],2);
-let wave3_1 = new wave(10,[enemie_1,enemie_3,enemie_4,],3);
+let wave3_1 = new wave(100,[enemie_2,enemie_3,enemie_4,enemie_5],4);
 let wave4_1 = new wave(10,[enemie_2,enemie_4],2);
 
 let level_1 = new levels([wave1_1,wave2_1,wave3_1,wave4_1],'./sprites/space_9.jpg',3);
@@ -1171,5 +1133,6 @@ level_3.initialisation();
 
 let game = new Game([level_1,level_2,level_3]);
 game.initialisation();
+
 
 
