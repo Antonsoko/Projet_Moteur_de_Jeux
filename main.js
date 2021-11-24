@@ -180,7 +180,7 @@ class wave{
           }
         }
       }
-    ,2000
+    ,2689
     );
     
   }
@@ -241,15 +241,19 @@ class Enemy{
     
     switch(this.proj_type){
       case 1 :
+        tir_2.play();
         enemie_shoot_simple(this,this.projectile);
       break;
       case 2 :
+        tir_2.play();
         enemie_shoot_double(this,this.projectile);
       break;
       case 3 :
+        tir_2.play();
         enemie_shoot_triple(this,this.projectile);
       break;
       case 4 :
+        
         enemie_shoot_arc_cercle(this,this.projectile,1);
         //enemie_shoot_arc_cercle(this,this.projectile,-1);
       break;
@@ -313,6 +317,7 @@ function enemie_shoot_arc_cercle(enemie,projec,sens){
   let nb_a_shooter = 0;
   let angle = 0;
   let vitesse = projec.vy;
+  tir_5.play();
   let shoot_in_circle = setInterval(  
     function(){
       if(nb_a_shooter>=15 || enemie.vie <= 0){
@@ -320,6 +325,7 @@ function enemie_shoot_arc_cercle(enemie,projec,sens){
         shoot_in_circle = null;
       }
       else{
+        
         angle+=0.20;
         let vx_ = vitesse*Math.cos(angle*sens);
         let vy_ = vitesse*Math.sin(angle);
@@ -331,7 +337,6 @@ function enemie_shoot_arc_cercle(enemie,projec,sens){
     }
   ,100); 
 }
-
 function iteration_enemi_shoot(liste){
   let current = liste.get_head();
 
@@ -445,14 +450,14 @@ const List_projectile_joueur = new LinkedListFactory();
 const List_projectile_Enemy = new LinkedListFactory();
 const List_Enemy = new LinkedListFactory();
 
-let projectile_1_enemie = new projectile(0,0,0,35,'./sprites/beams_green.png',20,1111,1);
-let projectile_2_enemie = new projectile(0,0,0,40,'./sprites/beams_red.png',40,1111,1);
+let projectile_1_enemie = new projectile(0,0,0,35,'./sprites/beams_green.png',20,1246,1);
+let projectile_2_enemie = new projectile(0,0,0,40,'./sprites/beams_red.png',40,1193,1);
 let projectile_3_enemie = new projectile(0,0,0,35,'./sprites/beams_blue_ball.png',50,2222,2);
 let projectile_4_enemie = new projectile(0,0,0,30,'./sprites/beams_red.png',100,3333,2);
-let projectile_5_enemie = new projectile(0,0,0,30,'./sprites/beams_blue.png',15,2222,1.5);
+let projectile_5_enemie = new projectile(0,0,0,30,'./sprites/beams_blue.png',15,3759,1.5);
 
-let projectile_1_joueur = new projectile(0,0,0,-30,'./sprites/beams_blue.png',15,250,1.5);
-let projectile_2_joueur = new projectile(0,0,0,-55,'./sprites/beams_red.png',50,600,1);
+let projectile_1_joueur = new projectile(0,0,0,-25,'./sprites/beams_blue.png',35,444,1.5);
+let projectile_2_joueur = new projectile(0,0,0,-55,'./sprites/beams_red.png',50,700,1);
 let projectile_3_joueur = new projectile(0,0,0,-20,'./sprites/beams_blue.png',20,200,1);
 
 let enemie_1 = new Enemy(0,0,0,0,2,'Normal',50,'./sprites/Enemy_n_2.png',projectile_1_enemie,0.1,1);
@@ -488,6 +493,29 @@ let decors_sprites_plan_2 = ['./sprites/rock_1.png','./sprites/rock_2.png','./sp
 let decors_sprites_plan_3 = ['./sprites/planet_2.png','./sprites/planet_3.png','./sprites/planet_4.png','./sprites/planet_5.png','./sprites/planet_6.png','./sprites/planet_7.png','./sprites/planet_8.png','./sprites/planet_10.png','./sprites/planet_11.png','./sprites/planet_12.png'];
 let decors_sprites_plan_4 = ['./sprites/neb_1.png','./sprites/neb_2.png','./sprites/neb_3.png'];
 
+var myAudio = document.createElement("audio");
+myAudio.src = "./Mp3/Music1.mp3";
+
+var tir_1 = document.createElement("audio");
+tir_1.src = "./Mp3/Tir_1.mp3";
+
+var tir_2 = document.createElement("audio");
+tir_2.src = "./Mp3/Tir_2.mp3";
+
+var tir_3 = document.createElement("audio");
+tir_3.src = "./Mp3/Tir_3.mp3";
+
+var tir_4 = document.createElement("audio");
+tir_4.src = "./Mp3/tir_cour.mp3";
+
+var tir_5 = document.createElement("audio");
+tir_5.src = "./Mp3/tir_long.mp3";
+
+
+
+
+
+
 function init_decors_(tab_decors,decors_sprites,n){
   for(var i = 0;i<10;i++){
     var x_ = Math.round(Math.random() * cnv.width - 300);
@@ -510,9 +538,12 @@ let Enemis_mort = 0;
 let Total_enemis = 0;
 
 function test_vie(liste,element){
+  var explo_1 = document.createElement("audio");
+  explo_1.src = "./Mp3/explo_1.mp3"; 
   if(element.vie <= 0){
     game.current_level.current_wave.enemie_en_vie--;
     game.current_level.current_wave.enemie_mort++;
+    explo_1.play();
     //console.log("En vie : ",Enemis_Vivant,"Mort : ",Enemis_mort,"Total : ", Total_enemis);
     liste.remove(element);
     
@@ -918,6 +949,7 @@ function keydown_fun(e) {
     break;
     case "Enter":
       start_game();
+      myAudio.play();
     break;
     }
     
@@ -931,7 +963,7 @@ let projectile_3 = new projectile(0,0,0,0,0,0,0,0);
 let projectile_4 = new projectile(0,0,0,0,0,0,0,0);
 let projectile_5 = new projectile(0,0,0,0,0,0,0,0);
 
-let type_canon = 2;
+let type_canon = 1;
 let frequence_tir_joueur = 1000;
 
 
@@ -948,6 +980,7 @@ function choosing_type_canon(type_canon){
 
   switch(type_canon){
     case 1:
+      tir_4.play();
       vx_ = projectile_1_joueur.vx;
       vy_ = projectile_1_joueur.vy;
       src_= projectile_1_joueur.src;
@@ -967,6 +1000,7 @@ function choosing_type_canon(type_canon){
     break;
 
     case 2:
+      
       vx_ = projectile_2_joueur.vx;
       vy_ = projectile_2_joueur.vy;
       src_ = projectile_2_joueur.src;
@@ -993,6 +1027,13 @@ function PlayerShooting(){
   var x = Joueur.x-15;
   var y = Joueur.y-20;
 
+  if(type_canon == 1) {
+    tir_4.play();
+  }
+  else if(type_canon == 2){
+    tir_1.play();
+  }
+  
   let projectile_1_ = new projectile(projectile_1.x,projectile_1.y,projectile_1.vx,projectile_1.vy,projectile_1.src,projectile_1.degats,projectile_1.freq,projectile_1.size);
   projectile_1_.x += x;
   projectile_1_.y += y;
@@ -1021,7 +1062,7 @@ function PlayerShooting(){
   projectile_5_.x += x;
   projectile_5_.y += y;
   
-
+  
   switch(lvl_canon){
     case 1:
       List_projectile_joueur.append(projectile_1_);
