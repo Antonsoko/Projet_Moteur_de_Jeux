@@ -85,13 +85,13 @@ class Game{
       }
       else{
         this.finished = true;
-        console.log("level finished");
+        console.log("game finished");
       }
     }
 }
 
 class levels{
-  constructor(tab_of_wave,img,size){
+  constructor(tab_of_wave,img,size,imglvl){
     this.number_of_wave = tab_of_wave.length;
     this.waves = tab_of_wave;
     this.wave_id = 0;
@@ -99,6 +99,8 @@ class levels{
     this.finished = false;
     this.img = img;
     this.size = size;
+    this.img_level = imglvl;
+    this.time_img_lvl = 3000;
   }
 
   initialisation(){
@@ -109,6 +111,7 @@ class levels{
   }
 
   next_wave(){
+    changement_arme();
     this.wave_id++;
     if(this.waves.length > this.wave_id){
       this.current_wave = this.waves[this.wave_id];
@@ -117,9 +120,49 @@ class levels{
       this.finished = true;
       console.log("level finished");
     }
+
+  }
+
+  affiche_img_lvl(){
+    let img = new Image();
+    img.src = this.img_level;
+    this.time_img_lvl -=15;
+    context.drawImage(img,cnv.width/2-400,cnv.height/2-100,img.width,img.height);
+
+
   }
 }
 
+
+
+class bonus{
+  constructor(x,y,type,img,size){
+    this.x = x;
+    this.y = y;
+    this.type = type;
+    this.img = img;
+    this.size = size;
+  }
+}
+
+function spawn_bonus(type){
+  let x_ = Math.round(Math.random() * (cnv.width -300) + 150);
+  let bonus_1;
+
+  switch(type){
+    case 1:
+      bonus_1 = new bonus(x_,-300,'WP','./sprites/sat_1.png',0.3);//changement arme
+      break;
+    case 2:
+      bonus_1 = new bonus(x_,-300,'LVL','./sprites/sat_1.png',0.3);//ajoute niveau arme
+      break;
+    case 3:
+      bonus_1 = new bonus(x_,-300,'LF','./sprites/sat_1.png',0.3);//vie
+      break;
+  }
+
+  List_Bonus.append(bonus_1);
+}
 
 class wave{
   constructor(nb_enemie,tab_enemie,nbe){
@@ -146,7 +189,7 @@ class wave{
           spawninterval = null;
         }
         else{
-          let nb_enemie_a_spawn = Math.floor(Math.random() * 3)+1;
+          let nb_enemie_a_spawn = Math.floor(Math.random() * 3)+3;
 
           if((enemie_restant_a_spawner - nb_enemie_a_spawn)< 0){
             nb_enemie_a_spawn = enemie_restant_a_spawner;
@@ -180,7 +223,7 @@ class wave{
           }
         }
       }
-    ,2689
+    ,1500
     );
     
   }
@@ -292,7 +335,6 @@ function enemie_shoot_simple(enemie,projec){
   let proj = new projectile(enemie.x,enemie.y,proj_cp.vx,proj_cp.vy,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
   List_projectile_Enemy.append(proj);
 }
-
 function enemie_shoot_double(enemie,projec){
   let proj_cp = projec;
   let proj_1 = new projectile(enemie.x-(100*enemie.size),enemie.y,proj_cp.vx,proj_cp.vy,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
@@ -300,7 +342,6 @@ function enemie_shoot_double(enemie,projec){
   List_projectile_Enemy.append(proj_1);
   List_projectile_Enemy.append(proj_2);
 }
-
 function enemie_shoot_triple(enemie,projec){
   let proj_cp = projec;
   let proj_1 = new projectile(enemie.x-(150*enemie.size),enemie.y,proj_cp.vx,proj_cp.vy,proj_cp.src,proj_cp.degats,proj_cp.freq,proj_cp.size);
@@ -310,13 +351,14 @@ function enemie_shoot_triple(enemie,projec){
   List_projectile_Enemy.append(proj_2);
   List_projectile_Enemy.append(proj_3);
 }
-
 function enemie_shoot_arc_cercle(enemie,projec,sens){
-  console.log("prout");
+  
   let proj_cp = projec;
   let nb_a_shooter = 0;
   let angle = 0;
   let vitesse = projec.vy;
+  var tir_5 = document.createElement("audio");
+  tir_5.src = "./Mp3/tir_long.mp3";
   tir_5.play();
   let shoot_in_circle = setInterval(  
     function(){
@@ -449,24 +491,24 @@ function LinkedListFactory() {
 const List_projectile_joueur = new LinkedListFactory();
 const List_projectile_Enemy = new LinkedListFactory();
 const List_Enemy = new LinkedListFactory();
+const List_Bonus = new LinkedListFactory();
 
-let projectile_1_enemie = new projectile(0,0,0,35,'./sprites/beams_green.png',20,1246,1);
-let projectile_2_enemie = new projectile(0,0,0,40,'./sprites/beams_red.png',40,1193,1);
-let projectile_3_enemie = new projectile(0,0,0,35,'./sprites/beams_blue_ball.png',50,2222,2);
-let projectile_4_enemie = new projectile(0,0,0,30,'./sprites/beams_red.png',100,3333,2);
-let projectile_5_enemie = new projectile(0,0,0,30,'./sprites/beams_blue.png',15,3759,1.5);
+let projectile_1_enemie = new projectile(0,0,0,35,'./sprites/beams_green.png',20,2000,1);
+let projectile_2_enemie = new projectile(0,0,0,40,'./sprites/beams_red.png',40,1000,1);
+let projectile_3_enemie = new projectile(0,0,0,35,'./sprites/beams_blue_ball.png',50,3000,2);
+let projectile_4_enemie = new projectile(0,0,0,30,'./sprites/beams_red.png',100,4000,2);
+let projectile_5_enemie = new projectile(0,0,0,30,'./sprites/beams_blue.png',15,5000,1.5);
 
-let projectile_1_joueur = new projectile(0,0,0,-25,'./sprites/beams_blue.png',35,444,1.5);
-let projectile_2_joueur = new projectile(0,0,0,-55,'./sprites/beams_red.png',50,700,1);
+let projectile_1_joueur = new projectile(0,0,0,-25,'./sprites/beams_blue.png',50,400,1.5);
+let projectile_2_joueur = new projectile(0,0,0,-45,'./sprites/beams_red.png',100,700,1);
 let projectile_3_joueur = new projectile(0,0,0,-20,'./sprites/beams_blue.png',20,200,1);
 
-let enemie_1 = new Enemy(0,0,0,0,2,'Normal',50,'./sprites/Enemy_n_2.png',projectile_1_enemie,0.1,1);
-let enemie_2 = new Enemy(0,0,0,0,4,'Normal',20,'./sprites/Enemy_n_1.png',projectile_2_enemie,0.1,1);
-let enemie_3 = new Enemy(0,0,0,0,3,'Normal',200,'./sprites/Enemy_n_1.png',projectile_3_enemie,0.2,1);
-let enemie_4 = new Enemy(0,0,0,0,1.5,'Normal',400,'./sprites/Enemy_n_2.png',projectile_4_enemie,0.3,1);
-let enemie_5 = new Enemy(0,0,0,0,1.5,'Normal',400,'./sprites/Enemy_n_2.png',projectile_5_enemie,0.3,4);
+let enemie_1 = new Enemy(0,0,0,0,1.5,'Normal',50,'./sprites/Enemy_n_2.png',projectile_1_enemie,0.1,1);
+let enemie_2 = new Enemy(0,0,0,0,3.5,'Normal',20,'./sprites/Enemy_n_1.png',projectile_2_enemie,0.1,1);
+let enemie_3 = new Enemy(0,0,0,0,2,'Normal',200,'./sprites/Enemy_n_1.png',projectile_3_enemie,0.2,1);
+let enemie_4 = new Enemy(0,0,0,0,1,'Normal',400,'./sprites/Enemy_n_2.png',projectile_4_enemie,0.3,1);
+let enemie_5 = new Enemy(0,0,0,0,1,'Normal',800,'./sprites/Enemy_n_2.png',projectile_5_enemie,0.3,4);
 
-let nombre_enemie = 4;
 
 let Fond_space_1_i1 = new Image();
 
@@ -480,8 +522,8 @@ let poussiere_tab = [];
 let nb_poussière = 100;
 let trainée = [];
 let bout_trainée = [0,0];
-var lvl_canon = 4;
-let Joueur = new Player(1000,1000,1000);//x,y,vie
+var lvl_canon = 5;
+let Joueur = new Player(cnv.width/2 -50,1000,1000);//x,y,vie
 
 let tab_decors_plan_1 = [];
 let tab_decors_plan_2 = [];
@@ -491,7 +533,7 @@ let tab_decors_plan_4 = [];
 let decors_sprites_plan_1 = ['./sprites/sat_1.png','./sprites/rock_1.png','./sprites/rock_2.png','./sprites/rock_3.png'];
 let decors_sprites_plan_2 = ['./sprites/rock_1.png','./sprites/rock_2.png','./sprites/rock_3.png'];
 let decors_sprites_plan_3 = ['./sprites/planet_2.png','./sprites/planet_3.png','./sprites/planet_4.png','./sprites/planet_5.png','./sprites/planet_6.png','./sprites/planet_7.png','./sprites/planet_8.png','./sprites/planet_10.png','./sprites/planet_11.png','./sprites/planet_12.png'];
-let decors_sprites_plan_4 = ['./sprites/neb_1.png','./sprites/neb_2.png','./sprites/neb_3.png'];
+let decors_sprites_plan_4 = ['./sprites/planet_2.png','./sprites/planet_3.png','./sprites/planet_4.png','./sprites/planet_5.png','./sprites/planet_6.png','./sprites/planet_7.png','./sprites/planet_8.png','./sprites/planet_10.png','./sprites/planet_11.png','./sprites/planet_12.png'];
 
 var myAudio = document.createElement("audio");
 myAudio.src = "./Mp3/Music1.mp3";
@@ -512,7 +554,10 @@ var tir_5 = document.createElement("audio");
 tir_5.src = "./Mp3/tir_long.mp3";
 
 
-
+init_decors_(tab_decors_plan_1,decors_sprites_plan_1,3.5);
+init_decors_(tab_decors_plan_2,decors_sprites_plan_2,3);
+init_decors_(tab_decors_plan_3,decors_sprites_plan_3,2);
+init_decors_(tab_decors_plan_4,decors_sprites_plan_4,1);
 
 
 
@@ -528,10 +573,45 @@ function init_decors_(tab_decors,decors_sprites,n){
   }
 }
 
-init_decors_(tab_decors_plan_1,decors_sprites_plan_1,3.5);
-init_decors_(tab_decors_plan_2,decors_sprites_plan_2,3);
-init_decors_(tab_decors_plan_3,decors_sprites_plan_3,2);
-init_decors_(tab_decors_plan_4,decors_sprites_plan_4,1.8);
+function joueur_cherche_enemie(){
+
+  let x_joueur = Joueur.x;
+  let y_joueur = Joueur.y;
+  let current = List_Enemy.get_head();
+
+  let y_enemi_pb = 0;
+
+  let enemie_a_trouve = null;
+  while(current){
+    let y_enemi = current.element.y;
+    if(y_enemi > y_enemi_pb && y_joueur-250 > y_enemi){
+      y_enemi_pb = y_enemi;
+      enemie_a_trouve = current.element;
+    }
+    current = current.next;
+  }
+
+  if(enemie_a_trouve == null && setinterval_space_id){
+    joueur_tir();
+  }
+  else if(enemie_a_trouve && setinterval_space_id == null){
+    joueur_tir();
+  }
+
+
+
+  if(enemie_a_trouve){
+    if(x_joueur > enemie_a_trouve.x){
+      dash_left();
+    }
+    if(x_joueur < enemie_a_trouve.x){
+      dash_right();
+    }
+  }
+
+
+}
+
 
 let Enemis_Vivant = 0;
 let Enemis_mort = 0;
@@ -541,6 +621,15 @@ function test_vie(liste,element){
   var explo_1 = document.createElement("audio");
   explo_1.src = "./Mp3/explo_1.mp3"; 
   if(element.vie <= 0){
+    /*
+    let proba = Math.round(Math.random() * 20);
+    if(proba == 0){
+      let type_ = Math.round(Math.random() * 3);
+      console.log("ghdofhougfdiugdgûdgdiu");
+      spawn_bonus(type_);
+    }
+    */
+    
     game.current_level.current_wave.enemie_en_vie--;
     game.current_level.current_wave.enemie_mort++;
     explo_1.play();
@@ -549,7 +638,6 @@ function test_vie(liste,element){
     
   }
 }
-
 function affiche_projectile(liste){
   let current = liste.get_head();
 
@@ -572,7 +660,6 @@ function affiche_projectile(liste){
     current = current.next;
   }
 }
-
 function affiche_enemy(liste){
 
   let current = liste.get_head();
@@ -580,12 +667,29 @@ function affiche_enemy(liste){
   while(current){
     let image = new Image();
     image.src = current.element.img;
+
     let grandeur = current.element.size;
     context.drawImage(image,current.element.x,current.element.y,image.width*grandeur,image.height*grandeur);
     //current.element.draw_collision();
     current = current.next;
   }
 }
+
+function affiche_bonus(liste){
+
+  let current = liste.get_head();
+
+  while(current){
+    let image = new Image();
+    image.src = current.element.img;
+
+    let grandeur = current.element.size;
+    context.drawImage(image,current.element.x,current.element.y,image.width*grandeur,image.height*grandeur);
+    //current.element.draw_collision();
+    current = current.next;
+  }
+}
+
 function return_element_aleatoire(liste){
 
   let position = Math.round(Math.random() * (length-2)+1);
@@ -640,6 +744,22 @@ function update_pos_enemy_normaux(liste){
     }
   }
 }
+function update_pos_bonus(liste){
+  let current = liste.get_head();
+
+  while(current){
+
+    let vit = 10;
+    current.element.y += vit;
+    let current_a_détruire = current;
+
+    current = current.next;
+
+    if(current_a_détruire.element.y >= cnv.height){
+      liste.remove(current_a_détruire.element);
+    }
+  }
+}
 function test_collision_projectiles(liste_colliders,liste_collided){
   let current_Lpj = liste_colliders.get_head();//liste projectile joueur
   
@@ -690,13 +810,16 @@ for(let i = 0;i<nb_poussière;i++){
 }
 
 function draw(){
+
+
+
   context.clearRect(-10000,-1000,3000,3000)
   let size_ = game.current_level.size;
   context.drawImage(Fond_space_1_i1,coord_fond_1[0],coord_fond_1[1],Fond_space_1_i1.width*size_,Fond_space_1_i1.height*size_);
   context.drawImage(Fond_space_1_i1,coord_fond_2[0],coord_fond_2[1],Fond_space_1_i1.width*size_,Fond_space_1_i1.height*size_);
 
   for(var i = 0;i<tab_decors_plan_4.length;i++){
-    var size = tab_decors_plan_4[i].size;
+    var size = tab_decors_plan_4[i].size/2;
     context.drawImage(tab_decors_plan_4[i].image,tab_decors_plan_4[i].x,tab_decors_plan_4[i].y,tab_decors_plan_4[i].image.width*size,tab_decors_plan_4[i].image.height*size);
   }
   for(var i = 0;i<tab_decors_plan_3.length;i++){
@@ -727,6 +850,7 @@ function draw(){
   affiche_projectile(List_projectile_joueur);
   affiche_projectile(List_projectile_Enemy);
   affiche_enemy(List_Enemy);
+  //affiche_enemy(List_Bonus);
   iteration_enemi_shoot(List_Enemy);
 
   context.drawImage(Vaisseau_joueur,Joueur.x-54,Joueur.y,Vaisseau_joueur.width*0.15,Vaisseau_joueur.height*0.15);  
@@ -748,13 +872,17 @@ function draw(){
   context.stroke();
   context.closePath(); 
   */
-
+  if(game.current_level.time_img_lvl>0){
+    game.current_level.affiche_img_lvl();
+  }
 }
 
 function upgrade_pos(){
-  if(coord_fond_1[1]>=Fond_space_1_i1.height*2){
-    coord_fond_1[1] = 0;
-    coord_fond_2[1] = -Fond_space_1_i1.height*2;
+
+  let size = game.current_level.size;
+  if(coord_fond_1[1]>=cnv.height){
+    coord_fond_1 = [-200,-(Fond_space_1_i1.height*size -cnv.height)];
+    coord_fond_2 = [-200,-(Fond_space_1_i1.height*size -cnv.height)-Fond_space_1_i1.height*size];
   }
   else{
     coord_fond_1[1] +=0.15;
@@ -807,9 +935,20 @@ function upgrade_pos(){
   //List_Enemy.update_pos_enemy_normaux();
   //List_projectile_Enemy.update_pos_projectiles();
   update_pos_enemy_normaux(List_Enemy);
+  //update_pos_bonus(List_Bonus);
   update_pos_projectiles(List_projectile_joueur);
   update_pos_projectiles(List_projectile_Enemy);
 
+}
+
+function changement_arme(){
+  if(type_canon == 1){
+    type_canon = 2;
+  }
+  else if(type_canon == 2){
+    type_canon = 1;
+  }
+  choosing_type_canon(type_canon);
 }
 
 function lerp (start, end, amt){
@@ -823,43 +962,45 @@ var intervalid_dd = null;
 
 function dash_right(){
   let x_vise = Joueur.x+80;
-
-  intervalid_dr = setInterval(
-    function (){
-      if(Joueur.x >= x_vise){
-        clearInterval(intervalid_dr);
-        intervalid_dr = null;
+  if(Joueur.x<cnv.width-100 && candash()){
+    intervalid_dr = setInterval(
+      function (){
+        if(Joueur.x >= x_vise){
+          clearInterval(intervalid_dr);
+          intervalid_dr = null;
+        }
+        else{
+          let prout = lerp(Joueur.x, x_vise, 0.2);
+          Joueur.x = prout+3;
+          Joueur.face_collision[0].x =prout+3-23;
+          Joueur.face_collision[1].x =prout+3-23;
+          Joueur.face_collision[2].x =prout+3+50;
+          Joueur.face_collision[3].x =prout+3+50;
+        }
       }
-      else{
-        let prout = lerp(Joueur.x, x_vise, 0.2);
-        Joueur.x = prout+3;
-        Joueur.face_collision[0].x =prout+3-23;
-        Joueur.face_collision[1].x =prout+3-23;
-        Joueur.face_collision[2].x =prout+3+50;
-        Joueur.face_collision[3].x =prout+3+50;
-      }
+      ,5);
     }
-    ,5);
 }
 function dash_left(){
   let x_vise = Joueur.x-80;
-
-  intervalid_dl = setInterval(
-    function (){
-      if(Joueur.x <= x_vise){
-        clearInterval(intervalid_dl);
-        intervalid_dl = null;
+  if(Joueur.x>100 && candash()){
+    intervalid_dl = setInterval(
+      function (){
+        if(Joueur.x <= x_vise){
+          clearInterval(intervalid_dl);
+          intervalid_dl = null;
+        }
+        else{
+          let prout = lerp(Joueur.x, x_vise, 0.2);
+          Joueur.x = prout-3;
+          Joueur.face_collision[0].x =prout-3-23;
+          Joueur.face_collision[1].x =prout-3-23;
+          Joueur.face_collision[2].x =prout-3+50;
+          Joueur.face_collision[3].x =prout-3+50;
+        }
       }
-      else{
-        let prout = lerp(Joueur.x, x_vise, 0.2);
-        Joueur.x = prout-3;
-        Joueur.face_collision[0].x =prout-3-23;
-        Joueur.face_collision[1].x =prout-3-23;
-        Joueur.face_collision[2].x =prout-3+50;
-        Joueur.face_collision[3].x =prout-3+50;
-      }
-    }
-    ,5);
+      ,5);
+  }
 
 }
 function dash_up(){
@@ -939,20 +1080,27 @@ function keydown_fun(e) {
       }
     break;
     case "Space":
-      if(setinterval_space_id == null){
-        setinterval_space_id = setInterval(PlayerShooting, frequence_tir_joueur);
-      }
-      else{
-        clearInterval(setinterval_space_id);
-        setinterval_space_id = null;
-      }
+      joueur_tir();
     break;
     case "Enter":
+      clearInterval(affiche_ecran_titre_id);
+      affiche_ecran_titre_id = null;
       start_game();
       myAudio.play();
+
     break;
     }
     
+}
+
+function joueur_tir(){
+  if(setinterval_space_id == null){
+    setinterval_space_id = setInterval(PlayerShooting, frequence_tir_joueur);
+  }
+  else{
+    clearInterval(setinterval_space_id);
+    setinterval_space_id = null;
+  }
 }
 
 let projectile_1 = new projectile(0,0,0,0,0,0,0,0);
@@ -963,11 +1111,11 @@ let projectile_3 = new projectile(0,0,0,0,0,0,0,0);
 let projectile_4 = new projectile(0,0,0,0,0,0,0,0);
 let projectile_5 = new projectile(0,0,0,0,0,0,0,0);
 
-let type_canon = 1;
+let type_canon = 2;
 let frequence_tir_joueur = 1000;
 
 
-choosing_type_canon(type_canon);
+
 
 function choosing_type_canon(type_canon){
   
@@ -980,7 +1128,7 @@ function choosing_type_canon(type_canon){
 
   switch(type_canon){
     case 1:
-      tir_4.play();
+      
       vx_ = projectile_1_joueur.vx;
       vy_ = projectile_1_joueur.vy;
       src_= projectile_1_joueur.src;
@@ -1110,11 +1258,19 @@ function update2(){
 
 function start_game(){
   Fond_space_1_i1.src = game.current_level.img;
-  coord_fond_1 = [-300,-Fond_space_1_i1.height*2+cnv.height];
-  coord_fond_2 = [-300,-Fond_space_1_i1.height*4+cnv.height];
+  let size = game.current_level.size;
+
+
+  coord_fond_1 = [-200,-(Fond_space_1_i1.height*size -cnv.height)];
+  coord_fond_2 = [-200,-(Fond_space_1_i1.height*size -cnv.height)-Fond_space_1_i1.height*size];
+
+
   let setinterval_global_update_id = setInterval(update, 15);
-  let setinterval_global_update_2_id = setInterval(update2, 50);
+  let setinterval_global_update_2_id = setInterval(update2, 30);
   setInterval(current,500);
+  setInterval(joueur_cherche_enemie,100);
+  changement_arme();
+  joueur_tir();
 }
 
 function current(){
@@ -1138,34 +1294,34 @@ function current(){
   if(game.current_level.finished){
     game.next_level();
     Fond_space_1_i1.src = game.current_level.img;
-    coord_fond_1 = [-200,-Fond_space_1_i1.height*2+cnv.height];
-    coord_fond_2 = [-200,-Fond_space_1_i1.height*4+cnv.height];
+    coord_fond_1 = [-200,-Fond_space_1_i1.height+cnv.height];
+    coord_fond_2 = [-200,-Fond_space_1_i1.height*2+cnv.height];
   }
 }
 
+ 
 
 
+let wave1_1 = new wave(20,[enemie_1],1);
+let wave2_1 = new wave(30,[enemie_1,enemie_2],2);
+let wave3_1 = new wave(40,[enemie_2,enemie_3,enemie_4,enemie_5],4);
+let wave4_1 = new wave(10,[enemie_5,enemie_4],2);
 
-let wave1_1 = new wave(1,[enemie_5],1);
-let wave2_1 = new wave(10,[enemie_1,enemie_2],2);
-let wave3_1 = new wave(100,[enemie_2,enemie_3,enemie_4,enemie_5],4);
-let wave4_1 = new wave(10,[enemie_2,enemie_4],2);
-
-let level_1 = new levels([wave1_1,wave2_1,wave3_1,wave4_1],'./sprites/space_9.jpg',3);
+let level_1 = new levels([wave1_1,wave2_1,wave3_1,wave4_1],'./sprites/space_9.jpg',3,'./Image/lvl1.png');
 
 let wave1_2 = new wave(20,[enemie_1],1);
 let wave2_2 = new wave(15,[enemie_1,enemie_2,],2);
 let wave3_2 = new wave(30,[enemie_1,enemie_3,enemie_4,enemie_5],4);
 let wave4_2 = new wave(40,[enemie_1,enemie_2,enemie_4,enemie_5],4);
 
-let level_2 = new levels([wave1_2,wave2_2,wave3_2,wave4_2],'./sprites/space_10.jpg',3);
+let level_2 = new levels([wave1_2,wave2_2,wave3_2,wave4_2],'./sprites/space_10.jpg',3,'./Image/lvl2.png');
 
 let wave1_3 = new wave(20,[enemie_1],1);
 let wave2_3 = new wave(30,[enemie_1,enemie_2],2);
-let wave3_3 = new wave(30,[enemie_1,enemie_3,enemie_4],3);
+let wave3_3 = new wave(130,[enemie_1,enemie_3,enemie_4],3);
 let wave4_3 = new wave(30,[enemie_2,enemie_4],2);
 
-let level_3 = new levels([wave1_3,wave2_3,wave3_3,wave4_3],'./sprites/space_11.jpg',2);
+let level_3 = new levels([wave1_3,wave2_3,wave3_3,wave4_3],'./sprites/space_11.jpg',2,'./Image/lvl3.png');
 
 
 level_1.initialisation();
@@ -1175,5 +1331,37 @@ level_3.initialisation();
 let game = new Game([level_1,level_2,level_3]);
 game.initialisation();
 
+let img_titre_jeu = new Image();
+img_titre_jeu.src = './Image/nom_jeu.png';
 
+let img_titre_fond = new Image();
+img_titre_fond.src = './sprites/space_9.jpg';
+
+function draw_ecran_titre(){
+
+  
+  context.drawImage(img_titre_fond,-200,-(img_titre_fond.height*3 -cnv.height),img_titre_fond.width*3,img_titre_fond.height*3);
+
+  context.drawImage(img_titre_jeu,300,100,img_titre_jeu.width*2,img_titre_jeu.height*2);
+
+  for(let i = 0;i<poussiere_tab.length;i++){
+    context.beginPath();
+    context.arc(poussiere_tab[i][0],poussiere_tab[i][1],Math.random() * 0.5 +1.5, 0, 2*Math.PI);
+    context.fillStyle = "#FFFFFF";
+    context.fill();
+    context.closePath(); 
+  }
+
+  for(let i = 0;i<poussiere_tab.length;i++){
+    if(poussiere_tab[i][1]>cnv.height){
+      poussiere_tab[i][1] =0;
+    }
+    else{
+      poussiere_tab[i][1] += poussiere_tab[i][2];
+    }
+    
+  }
+}
+
+let affiche_ecran_titre_id = setInterval(draw_ecran_titre,15);
 
