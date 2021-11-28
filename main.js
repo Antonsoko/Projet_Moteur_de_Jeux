@@ -1,6 +1,7 @@
 let cnv = document.getElementById('myCanvas');
 let context = cnv.getContext('2d');
 
+//permet de modifier la taille du canvas pour s'ajuster à l'écran de l'utilisateur
 window.addEventListener('resize', resizeCanvas, false);
 function resizeCanvas() {
         cnv.width = window.innerWidth;
@@ -49,7 +50,6 @@ class Sgt {
         return true;
     }
 }
-
 function isIn(p0, P) { // Pt p0 is in polygon P ?
     let p1 = new Pt(0, 0); // infinite point or outside L
     let s0 = new Sgt(p0, p1);
@@ -62,10 +62,18 @@ function isIn(p0, P) { // Pt p0 is in polygon P ?
     }
     return ((nb_inters % 2) == 1);
 }
-
 function cw(a, b, c) {
     return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
+
+//Class gérant les projectiles, avec :
+
+// Coordonnées
+// Vitesse
+// Sprite
+// Degats
+// Frequence de tir
+// taille
 class projectile {
     constructor(x, y, vx, vy, src, degats, freq, size) {
         this.x = x;
@@ -84,6 +92,7 @@ let img = new Image();
 let anim_id = -1;
 img.src = "./sprites/explosion.png";
 
+//omportation image des explosions
 img.onload = function() {
   let canvas1 = document.createElement('canvas');
   canvas1.width = 158*5;
@@ -134,6 +143,17 @@ function explosiontest(point){
 },30);
   //ctx.clearRect(0, 0, cnv.width, cnv.h);
 }
+
+// Class Game qui va servir à gerer les différent lvl avec : 
+//
+// tableau des levels créé
+// indice des levels
+// Référence sur le level courant
+// Booléan pour savoir si on a fini le niveau et passer au suivant.
+//
+// Initialisation : qui vérifie si il y a des levels créé.
+// Next_level : qui passe au niveau suivant, si il n'y en a pas, le joueur gagne.
+
 class Game {
 
     constructor(lvls) {
@@ -147,12 +167,18 @@ class Game {
         if (this.levels.length != 0) {
             this.current_level = this.levels[0];
         }
+        else{
+            console.log("Pas levels crée");
+        }
     }
 
     next_level() {
         this.level_id++;
         if (this.levels.length > this.level_id) {
             this.current_level = this.levels[this.level_id];
+            Fond_space_1_i1.src = game.current_level.img;
+            coord_fond_1 = [0, -(Fond_space_1_i1.height * size - cnv.height)];
+            coord_fond_2 = [0, -(Fond_space_1_i1.height * size - cnv.height) - Fond_space_1_i1.height * size];
         } else {
             this.finished = true;
              console.log("perdu t'es nul lol mdr");
@@ -181,6 +207,18 @@ class Game {
         }
     }
 }
+
+// Classe levels qui va servir à gerer les différentes waves ou manche d'un niveau, avec :
+// 
+// Tableau des wave/manches créée.
+// l'image de fond du niveau
+// taille de l'image du niveau
+// L'image qu'on va afficher à chaque début de niveau.
+//
+// Initialisation : on vérifie si les waves/manches existes.
+// Next_wave : On passe à la wave suivante.
+// Affiche_img_lvl : On affiche la l'image qui préscide le numéro du level.
+
 class levels {
     constructor(tab_of_wave, img, size, imglvl) {
         this.number_of_wave = tab_of_wave.length;
@@ -198,6 +236,9 @@ class levels {
         if (this.waves.length >= 0) {
             this.current_wave = this.waves[0];
             this.wave_id = 0;
+        }
+        else{
+            console.log("ERROR : Pas de wave");
         }
     }
 
@@ -222,6 +263,8 @@ class levels {
 
     }
 }
+// Class Bonus /!\ ne fonctionne pas /!\
+// Etait prévu pour lorsque le joueur tue un enemeie il y ai un bonus qui tombe avec une certaine chance.
 class bonus {
     constructor(x, y, type, img, size) {
         this.x = x;
@@ -249,11 +292,26 @@ function spawn_bonus(type) {
 
     List_Bonus.append(bonus_1);
 }
+
+
+// Class wave qui gère le déroulement d'une wave, avec : 
+//
+// Nombre d'enemie dans la wave
+// Tabeau des enemies 
+// Le nombre d'enemie differents.
+// Nombre d'enemie en vie
+// Nombre d'enemie mort
+// Nombre d'enemie Total
+// Bouléan pour savoir si on la wave est finie.
+// Bouléan pour savoir si la wave à été commencée.
+//
+// Create_wave : Fait spawn les enemies aléatoirement en x en déhors du canvas, toutes les 1.5 secondes.
+
 class wave {
-    constructor(nb_enemie, tab_enemie, nbe) {
+    constructor(nb_enemie, tab_enemie) {
         this.nb_enemies = nb_enemie;
         this.enemie_tab = tab_enemie;
-        this.nb_of_enemie = nbe;
+        this.nb_of_enemie = tab_enemie.length;
         this.enemie_en_vie = 0;
         this.enemie_mort = 0;
         this.enemie_total = nb_enemie;
@@ -311,8 +369,26 @@ class wave {
 
     }
 }
+
+// Class Enemy avec :
+//
+// Coordonnées
+// Coordonnées relative
+// vitesse selon x et y
+// Type de l'enemie,
+// Vie
+// Sprite
+// Un tableau avec les 4 points de collisions de l'enemie calculé à partir de ses coordonnées x,y
+// Le projectile qu'il tir
+// Taille
+// Type qui sert à determiné si il tir 1 ou plusieur projectil à la fois.
+// Iterateur qui sert à déterminé quand est ce qu'il va tirer son projectile.
+//
+// draw_collisions : Dessine la collision de l'enemie, sert uniquement pour le débug.
+// shoot_enemie : Ici on test la variable proj_type, pour savoir quel fonction de tir on va choisir.
+// Iteration_shoot : Permet de calculer en fonction de l'update global quand est ce qu'il tir.
 class Enemy {
-    constructor(x, y, x_aux, y_aux, vit, type, vie, img, projectile_, size, pjt) {
+    constructor(x, y, x_aux, y_aux, vit, type, vie, img, projectile_, size, pjts) {
         this.x = x;
         this.y = y;
         this.x_aux = x_aux;
@@ -325,7 +401,7 @@ class Enemy {
         this.face_collision = [new Pt(this.x, this.y - 30 * (size * 10)), new Pt(this.x, this.y + 70 * (size * 10)), new Pt(this.x + 55 * (size * 10), this.y + 70 * (size * 10)), new Pt(this.x + 55 * (size * 10), this.y - 30 * (size * 10))];
         this.projectile = projectile_;
         this.size = size;
-        this.proj_type = pjt;
+        this.proj_type = pjts;
         this.id_iterator = 0;
     }
 
@@ -346,20 +422,6 @@ class Enemy {
         context.lineTo(this.face_collision[0].x, this.face_collision[0].y);
         context.stroke();
         context.closePath();
-    }
-
-    create_face_collision() {
-        this.face_collision = [new Pt(this.x, this.y - 30 * (size * 10)), new Pt(this.x, this.y + 70 * (size * 10)), new Pt(this.x + 55 * (size * 10), this.y + 70 * (size * 10)), new Pt(this.x + 55 * (size * 10), this.y - 30 * (size * 10))];
-    }
-
-    change_coord(x, y) {
-        this.x = x;
-        this.y = y;
-        this.create_face_collision();
-    }
-
-    change_src(src) {
-        this.img = src;
     }
 
     shoot_enemi() {
@@ -401,6 +463,12 @@ class Enemy {
         }
     }
 }
+// Class decors
+//
+// Coordonnées
+// Sprite (On) créer l'image en même temps).
+// taille 
+// vitesse en y
 class decors {
     constructor(x, y, src, size, vy) {
         this.x = x;
@@ -410,14 +478,16 @@ class decors {
         this.image = image_;
         this.size = size;
         this.vy = vy;
-
     }
 }
+// Fonction utilisé par shoot_enemie (vu plus haut)
+// tir un projectile
 function enemie_shoot_simple(enemie, projec) {
     let proj_cp = projec;
     let proj = new projectile(enemie.x, enemie.y, proj_cp.vx, proj_cp.vy, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
     List_projectile_Enemy.append(proj);
 }
+// Tir deux projectiles
 function enemie_shoot_double(enemie, projec) {
     let proj_cp = projec;
     let proj_1 = new projectile(enemie.x - (100 * enemie.size), enemie.y, proj_cp.vx, proj_cp.vy, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
@@ -425,6 +495,7 @@ function enemie_shoot_double(enemie, projec) {
     List_projectile_Enemy.append(proj_1);
     List_projectile_Enemy.append(proj_2);
 }
+// TIr trois projectiles
 function enemie_shoot_triple(enemie, projec) {
     let proj_cp = projec;
     let proj_1 = new projectile(enemie.x - (150 * enemie.size), enemie.y, proj_cp.vx, proj_cp.vy, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
@@ -434,6 +505,7 @@ function enemie_shoot_triple(enemie, projec) {
     List_projectile_Enemy.append(proj_2);
     List_projectile_Enemy.append(proj_3);
 }
+// Tir 15 projectiles en cercle.
 function enemie_shoot_arc_cercle(enemie, projec, sens) {
 
     let proj_cp = projec;
@@ -461,6 +533,7 @@ function enemie_shoot_arc_cercle(enemie, projec, sens) {
             }
         }, 100);
 }
+// Function qui sert à la classe enemie, on itère sur chaque enemie, le temps qu'il lui reste à attendre pour tirer à partir de la fonction globale update.
 function iteration_enemi_shoot(liste) {
     let current = liste.get_head();
 
@@ -472,6 +545,13 @@ function iteration_enemi_shoot(liste) {
         current = current.next;
     }
 }
+
+// Class Player
+//
+// Coordonées
+// vie
+// points /!\ pas implementé /!\
+// Tableau de points calculé à partir des coordonnées délimitant la collisions du joueur.
 class Player {
     constructor(x, y, vie) {
         this.x = x;
@@ -481,6 +561,7 @@ class Player {
         this.face_collision = [new Pt(this.x - 35, this.y), new Pt(this.x - 35, this.y + 70), new Pt(this.x + 15, this.y + 70), new Pt(this.x + 15, this.y)];
     }
 }
+// Fonction qui test la vie du joueur, si celle si est inferieur à 0, on arrête le jeux et on lui affiche game over.
 function joueur_test_vie() {
 
     if (Joueur.vie <= 0) {
@@ -511,6 +592,7 @@ function joueur_test_vie() {
     }
 }
 
+// Liste chainée
 function LinkedListFactory() {
     let head = null;
     let length = 0;
@@ -603,20 +685,27 @@ function LinkedListFactory() {
     }
 }
 
+// Déclaration de liste chainée Globales
 const List_projectile_joueur = new LinkedListFactory();
 const List_projectile_Enemy = new LinkedListFactory();
 const List_Enemy = new LinkedListFactory();
 const List_Bonus = new LinkedListFactory();
 
+
+// Objets préfabriqués
+
+// Projectiles des enemies : 
 let projectile_1_enemie = new projectile(0, 0, 0, 28, './sprites/beams_green.png', 20, 3000, 1);
 let projectile_2_enemie = new projectile(0, 0, 0, 30, './sprites/beams_red.png', 40, 1500, 1);
 let projectile_3_enemie = new projectile(0, 0, 0, 28, './sprites/beams_blue_ball.png', 50, 3000, 2);
 let projectile_4_enemie = new projectile(0, 0, 0, 23, './sprites/beams_red.png', 100, 4500, 2);
 let projectile_5_enemie = new projectile(0, 0, 0, 23, './sprites/beams_blue.png', 15, 4500, 1.5);
 
+// Projectiles du joueur : 
 let projectile_1_joueur = new projectile(0, 0, 0, -18, './sprites/beams_blue.png', 50, 400, 1.5);
 let projectile_2_joueur = new projectile(0, 0, 0, -36, './sprites/beams_red.png', 100, 700, 1);
 
+// Enemies : 
 let enemie_1 = new Enemy(0, 0, 0, 0, 1.5, 'Normal', 50, './sprites/Enemy_n_2.png', projectile_1_enemie, 0.075, 1);
 let enemie_2 = new Enemy(0, 0, 0, 0, 3.5, 'Normal', 20, './sprites/Enemy_n_1.png', projectile_2_enemie, 0.075, 1);
 let enemie_3 = new Enemy(0, 0, 0, 0, 2, 'Normal', 200, './sprites/Enemy_n_1.png', projectile_3_enemie, 0.15, 1);
@@ -625,12 +714,11 @@ let enemie_5 = new Enemy(0, 0, 0, 0, 1, 'Normal', 800, './sprites/Enemy_n_2.png'
 let enemie_6 = new Enemy(0, 0, 0, 0, 5, 'Tourne', 100, './sprites/Enemy_r_1.png', null, 0.075, 0);
 let enemie_7 = new Enemy(0, 0, 0, 0, 4, 'Tourne', 150, './sprites/Enemy_r_2.png', null, 0.15, 0);
 
-let Fond_space_1_i1 = new Image();
 
+// Variable globales : 
+let Fond_space_1_i1 = new Image();
 let Vaisseau_joueur = new Image();
 Vaisseau_joueur.src = './sprites/Joueur.png';
-
-
 let coord_fond_1;
 let coord_fond_2;
 let poussiere_tab = [];
@@ -638,43 +726,39 @@ let nb_poussière = 100;
 let trainée = [];
 let bout_trainée = [0, 0];
 var lvl_canon = 5;
-let Joueur = new Player(cnv.width / 2 - 50, cnv.height- 150, 1000); //x,y,vie
-
+let type_canon = 2;
+let frequence_tir_joueur = 1000;
+let Joueur = new Player(cnv.width / 2 - 50, cnv.height- 150, 9000); //x,y,vie
 let tab_decors_plan_1 = [];
 let tab_decors_plan_2 = [];
 let tab_decors_plan_3 = [];
 let tab_decors_plan_4 = [];
 
+// tableau des elements de décors.
 let decors_sprites_plan_1 = ['./sprites/sat_1.png', './sprites/rock_1.png', './sprites/rock_2.png', './sprites/rock_3.png','./sprites/asteroid_3.png','./sprites/asteroid_4.png','./sprites/asteroid_5.png','./sprites/asteroid_6.png','./sprites/asteroid_7.png','./sprites/asteroid_8.png'];
 let decors_sprites_plan_2 = ['./sprites/rock_1.png', './sprites/rock_2.png', './sprites/rock_3.png','./sprites/asteroid_3.png','./sprites/asteroid_4.png','./sprites/asteroid_5.png','./sprites/asteroid_6.png','./sprites/asteroid_7.png','./sprites/asteroid_8.png'];
 let decors_sprites_plan_3 = ['./sprites/planet_2.png', './sprites/planet_3.png', './sprites/planet_4.png', './sprites/planet_5.png', './sprites/planet_6.png', './sprites/planet_7.png', './sprites/planet_8.png', './sprites/planet_10.png', './sprites/planet_11.png', './sprites/planet_12.png'];
 let decors_sprites_plan_4 = ['./sprites/planet_2.png', './sprites/planet_3.png', './sprites/planet_4.png', './sprites/planet_5.png', './sprites/planet_6.png', './sprites/planet_7.png', './sprites/planet_8.png', './sprites/planet_10.png', './sprites/planet_11.png', './sprites/planet_12.png'];
 
+// Fichier audios : 
 let myAudio = document.createElement("audio");
 myAudio.src = "./Mp3/Music1.mp3";
-
 let tir_1 = document.createElement("audio");
 tir_1.src = "./Mp3/Tir_1.mp3";
-
 let tir_2 = document.createElement("audio");
 tir_2.src = "./Mp3/Tir_2.mp3";
-
 let tir_3 = document.createElement("audio");
 tir_3.src = "./Mp3/Tir_3.mp3";
-
 let tir_4 = document.createElement("audio");
 tir_4.src = "./Mp3/tir_cour.mp3";
-
 let tir_5 = document.createElement("audio");
 tir_5.src = "./Mp3/tir_long.mp3";
-
 let image_mort = new Image();
 image_mort.src = './sprites/mort.png';
-
 let image_gagne = new Image();
 image_gagne.src = './sprites/gagne.png';
 
-
+// Initialise les différents plans du décors.
 init_decors_(tab_decors_plan_1, decors_sprites_plan_1, 3.5);
 init_decors_(tab_decors_plan_2, decors_sprites_plan_2, 3);
 init_decors_(tab_decors_plan_3, decors_sprites_plan_3, 2);
@@ -700,6 +784,10 @@ function init_decors_(tab_decors, decors_sprites, n) {
     }
 }
 
+// Fonction qui sert à chercher les enemies que le joueur doit détruire, 
+//
+// Il se déplace en fonction des enemies les plus bas,
+// Si un enemies est trop bas il ne cherchera plus à le détruire et le laissera passer.
 function joueur_cherche_enemie() {
 
     let x_joueur = Joueur.x;
@@ -738,10 +826,7 @@ function joueur_cherche_enemie() {
 
 }
 
-let Enemis_Vivant = 0;
-let Enemis_mort = 0;
-let Total_enemis = 0;
-
+// Fonction testant la vie d'un enemie. Si sa vie est infèrieur à 0, on le détruit et actualise les informations sur la wave courrante.
 function test_vie(liste, element) {
     var explo_1 = document.createElement("audio");
     explo_1.src = "./Mp3/explo_1.mp3";
@@ -755,7 +840,7 @@ function test_vie(liste, element) {
 
     }
 }
-
+// Fonction qui affiche les projectiles, avec un code commenté qui sert à affiché le point de collisions de chacun des projectiles.
 function affiche_projectile(liste) {
     let current = liste.get_head();
 
@@ -780,6 +865,7 @@ function affiche_projectile(liste) {
 }
 var ang = 0
 
+// Fonction qui affiche les enemies.
 function affiche_enemy(liste) {
 
     let current = liste.get_head();
@@ -806,6 +892,7 @@ function affiche_enemy(liste) {
         current = current.next;
     }
 }
+// Fonction qui affiches les bonus /!\ Non foncionnelle /!\
 function affiche_bonus(liste) {
 
     let current = liste.get_head();
@@ -820,19 +907,7 @@ function affiche_bonus(liste) {
         current = current.next;
     }
 }
-function return_element_aleatoire(liste) {
-
-    let position = Math.round(Math.random() * (length - 2) + 1);
-    let index = 0;
-    let current = liste.get_head();
-    while (index++ < position) {
-        current = current.next;
-    }
-
-    if (Enemis_Vivant > 0) {
-        return current.element;
-    }
-}
+// Fonction qui actualise les positions des projectiles en fonction de leurs coordonnées et de leurs vitesse en x et en y.
 function update_pos_projectiles(liste) {
     let current = liste.get_head();
     while (current) {
@@ -848,6 +923,7 @@ function update_pos_projectiles(liste) {
         current = current.next;
     }
 }
+// Fonction qui actualise les positions des enemies en fonction de leurs coordonnées et de leurs vitesse en x et en y, et en même actualise leurs points de collisions
 function update_pos_enemy_normaux(liste) {
     let current = liste.get_head();
 
@@ -902,6 +978,7 @@ function update_pos_enemy_normaux(liste) {
         }
     }
 }
+// Fonction qui actualise la position des bonus /!\ Non foncionnelle /!\
 function update_pos_bonus(liste) {
     let current = liste.get_head();
 
@@ -918,6 +995,9 @@ function update_pos_bonus(liste) {
         }
     }
 }
+// Fonction qui test pour chaque projectiles si il collisionne un autre objets
+// Un projectile n'a comme surface de collision qu'un points, mais le joueur et les enemies, on un tableau de 4 points qui créent une surface de collisions.
+// Ici on test donc un point : le projectile, et un tableau de points avec la fonction IsIn().
 function test_collision_projectiles(liste_colliders, liste_collided) {
     let current_Lpj = liste_colliders.get_head(); //liste projectile joueur
 
@@ -939,6 +1019,7 @@ function test_collision_projectiles(liste_colliders, liste_collided) {
         current_Lpj = current_Lpj.next;
     }
 }
+// Ici on test pour une liste de projectile s'il touche le joueur.
 function test_collision_joueur(liste) {
 
     let current_Lpe = liste.get_head();
@@ -956,6 +1037,8 @@ function test_collision_joueur(liste) {
         current_Lpe = current_Lpe.next;
     }
 }
+// Ici on test pour tous les enemies du type 'Tourne' si il touche le joueur.
+// Donc Pour chaque points de la surface d'un enemie on test si il se trouve dans la surface de collisions du joueur. et on itère sur les 3 autres points de l'enemie.
 function test_collision_enemie_joueur(liste) {
     let current_Lpe = liste.get_head();
     let tableau_a_test = Joueur.face_collision;
@@ -985,6 +1068,7 @@ for (let i = 0; i < nb_poussière; i++) {
     }
     poussiere_tab.push(poussiere);
 }
+// Fonction qui dessine tout le jeu.
 function draw() {
 
     context.clearRect(0, 0, cnv.width ,cnv.height)
@@ -1050,6 +1134,7 @@ function draw() {
         game.current_level.affiche_img_lvl();
     }
 }
+// Fonction qui actualise les coordonnées de l'image de fond, des poussières, des elements de décors, des enemies, et des projectiles.
 function upgrade_pos() {
 
     let size = game.current_level.size;
@@ -1102,15 +1187,13 @@ function upgrade_pos() {
 
 
 
-    //List_projectile_joueur.update_pos_projectiles();
-    //List_Enemy.update_pos_enemy_normaux();
-    //List_projectile_Enemy.update_pos_projectiles();
     update_pos_enemy_normaux(List_Enemy);
     //update_pos_bonus(List_Bonus);
     update_pos_projectiles(List_projectile_joueur);
     update_pos_projectiles(List_projectile_Enemy);
 
 }
+// Fonction qui sert à switcher entre 2 armes, à changé si on veut plus de 2 armes.
 function changement_arme() {
     if (type_canon == 1) {
         type_canon = 2;
@@ -1122,18 +1205,20 @@ function changement_arme() {
 function lerp(start, end, amt) {
     return (1 - amt) * start + amt * end;
 }
-
+// Fonction qui affiche la vie du joueur, et la wave courante.
 function affiche_info_joueur(){
     context.font = 'bold 70px Verdana, OCR A Std, serif';
     context.fillStyle = '#48B';
     context.fillText('LIFE ' + Joueur.vie,50,cnv.height-50);
     context.fillText('WAVE ' + (game.current_level.wave_id+1),cnv.width-350,cnv.height-50);
 }
+
+// variable globale et référence sur les setInterval des dash, pour pouvoir ne faire qu'un seul dash à la fois dans nimporte quelle direction.
 var intervalid_dr = null;
 var intervalid_dl = null;
 var intervalid_du = null;
 var intervalid_dd = null;
-
+// 4 Fonctions dash qui font bouger le joueur.
 function dash_right() {
     let x_vise = Joueur.x + 80;
     if (Joueur.x < cnv.width - 100 && candash()) {
@@ -1221,7 +1306,7 @@ function candash() {
 }
 window.addEventListener('keydown', keydown_fun, false);
 let setinterval_space_id = null;
-
+// Fonction qui écoute le clavié du joueur.
 function keydown_fun(e) {
 
     switch (e.code) {
@@ -1261,7 +1346,7 @@ function keydown_fun(e) {
 
 }
 
-
+// Fonction qui siwtch entre tirer ou non.
 function joueur_tir() {
     if (setinterval_space_id == null) {
         setinterval_space_id = setInterval(PlayerShooting, frequence_tir_joueur);
@@ -1279,9 +1364,8 @@ let projectile_3 = new projectile(0, 0, 0, 0, 0, 0, 0, 0);
 let projectile_4 = new projectile(0, 0, 0, 0, 0, 0, 0, 0);
 let projectile_5 = new projectile(0, 0, 0, 0, 0, 0, 0, 0);
 
-let type_canon = 2;
-let frequence_tir_joueur = 1000;
 
+// Fonction qui en fonction du type d'arme du joueur, créer différents projectiles.
 function choosing_type_canon(type_canon) {
 
     let vx_ = 0;
@@ -1334,6 +1418,7 @@ function choosing_type_canon(type_canon) {
 
     }
 }
+// Fonction qui en fonction du niveau d'amre du joueur, instancie différents projectiles.
 function PlayerShooting() {
 
     var x = Joueur.x - 15;
@@ -1406,6 +1491,7 @@ function PlayerShooting() {
 
 
 }
+
 function update() {
     draw();
     upgrade_pos();
@@ -1417,21 +1503,20 @@ function update2() {
     test_collision_enemie_joueur(List_Enemy);
     
 }
+
 let setinterval_global_update_id = null;
 let setinterval_global_update_2_id = null;
 let setinterval_global_update_3_id = null;
 let setinterval_global_update_4_id = null;
 
+
+// Fonction qui démare le jeu, en initialisant l'image de fond à l'image du premier niveau.
 function start_game() {
-  
+
     Fond_space_1_i1.src = game.current_level.img;
     let size = game.current_level.size;
-
-
     coord_fond_1 = [0, -(Fond_space_1_i1.height * size - cnv.height)];
     coord_fond_2 = [0, -(Fond_space_1_i1.height * size - cnv.height) - Fond_space_1_i1.height * size];
-
-
     setinterval_global_update_id = setInterval(update, 15);
     setinterval_global_update_2_id = setInterval(update2, 30);
     setinterval_global_update_3_id = setInterval(current, 500);
@@ -1439,19 +1524,17 @@ function start_game() {
     changement_arme();
     joueur_tir();
 }
+
+// Fonction Qui va tester toutes les n secondes si on doit passer à la wave suivante ou au niveau suivant, en fonction des enemies vivant, mort, et totaux de la wave en cours.
 function current() {
     let e_t = game.current_level.current_wave.enemie_total;
     let e_m = game.current_level.current_wave.enemie_mort;
     let e_v = game.current_level.current_wave.enemie_en_vie;
 
-    console.log(e_t,e_m,e_v)
     if (!game.current_level.current_wave.HasSpawn) {
         game.current_level.current_wave.create_wave();
         game.current_level.current_wave.HasSpawn = true;
-    } else {
-
     }
-
     if (e_t == e_m && game.current_level.current_wave.wave_end) {
         game.current_level.next_wave();
     }
@@ -1459,52 +1542,57 @@ function current() {
     if (game.current_level.finished) {
         game.next_level();
         Fond_space_1_i1.src = game.current_level.img;
-        coord_fond_1 = [0, -Fond_space_1_i1.height + cnv.height];
-        coord_fond_2 = [0, -Fond_space_1_i1.height * 2 + cnv.height];
+        coord_fond_1 = [0, -(Fond_space_1_i1.height * size - cnv.height)];
+        coord_fond_2 = [0, -(Fond_space_1_i1.height * size - cnv.height) - Fond_space_1_i1.height * size];
     }
 }
 
-let wave1_1 = new wave(20, [enemie_1], 1);
-let wave2_1 = new wave(30, [enemie_1, enemie_2], 2);
-let wave3_1 = new wave(40, [enemie_2, enemie_3, enemie_4, enemie_5], 4);
-let wave4_1 = new wave(10, [enemie_5, enemie_4], 2);
+// Objets préfabriqué : 
 
-let level_1 = new levels([wave1_1], './sprites/space_9.jpg', 2, './Image/lvl1.png');
+// Waves du level 1
+let wave1_1 = new wave(20, [enemie_1]);
+let wave2_1 = new wave(30, [enemie_1, enemie_2]);
+let wave3_1 = new wave(40, [enemie_2, enemie_3, enemie_4, enemie_5]);
+let wave4_1 = new wave(50, [enemie_5, enemie_4]);
 
-let wave1_2 = new wave(20, [enemie_1], 1);
-let wave2_2 = new wave(15, [enemie_1, enemie_2,enemie_6], 3);
-let wave3_2 = new wave(30, [enemie_1, enemie_3, enemie_4, enemie_5,enemie_6], 5);
-let wave4_2 = new wave(40, [enemie_1, enemie_2, enemie_4, enemie_5,enemie_6,enemie_7], 6);
+// Création du level 1 avec un tableau de wave;
+let level_1 = new levels([wave1_1,wave2_1,wave3_1,wave4_1], './sprites/space_9.jpg', 2, './Image/lvl1.png');
 
-let level_2 = new levels([wave1_2, wave2_2, wave3_2, wave4_2], './sprites/space_10.jpg', 2, './Image/lvl2.png');
+let wave1_2 = new wave(20, [enemie_1]);
+let wave2_2 = new wave(15, [enemie_1, enemie_2,enemie_6]);
+let wave3_2 = new wave(30, [enemie_1, enemie_3, enemie_4, enemie_5,enemie_6]);
+let wave4_2 = new wave(40, [enemie_1, enemie_2, enemie_4, enemie_5,enemie_6,enemie_7]);
 
-let wave1_3 = new wave(20, [enemie_1], 1);
-let wave2_3 = new wave(30, [enemie_1, enemie_2], 2);
-let wave3_3 = new wave(130, [enemie_1, enemie_3, enemie_4], 3);
-let wave4_3 = new wave(30, [enemie_2, enemie_4], 2);
+let level_2 = new levels([wave1_2, wave2_2, wave3_2, wave4_2], './sprites/space_8.jpg', 2, './Image/lvl2.png');
 
-let level_3 = new levels([wave1_3, wave2_3, wave3_3, wave4_3], './sprites/space_11.jpg', 1.5, './Image/lvl3.png');
+let wave1_3 = new wave(20, [enemie_1]);
+let wave2_3 = new wave(30, [enemie_1, enemie_2]);
+let wave3_3 = new wave(50, [enemie_1, enemie_3, enemie_4]);
+let wave4_3 = new wave(100, [enemie_1, enemie_2,enemie_3, enemie_4, enemie_5,enemie_6,enemie_7]);
 
+let level_3 = new levels([wave1_3, wave2_3, wave3_3, wave4_3], './sprites/space_4.jpg', 2, './Image/lvl3.png');
 
+// Initialisation des levels, pour vérifié si on a des érreurs
 level_1.initialisation();
 level_2.initialisation();
 level_3.initialisation();
 
-let game = new Game([level_1]);
+// Instantiation du jeu avec une liste des levels,
+let game = new Game([level_1,level_2,level_3]);
+// On vérifie qu'il n'y ai pas dérreurs.
 game.initialisation();
 
-let img_titre_jeu = new Image();
-img_titre_jeu.src = './Image/nom_jeu.png';
 
-let img_titre_fond = new Image();
-img_titre_fond.src = './sprites/space_9.jpg';
-
+// affichage de l'écran titre.
 function draw_ecran_titre() {
 
-    
-    context.drawImage(img_titre_fond, 0, -(img_titre_fond.height * 2 - cnv.height), img_titre_fond.width * 2, img_titre_fond.height * 2);
+    let img_titre_jeu = new Image();
+    img_titre_jeu.src = './Image/nom_jeu.png';
 
-    context.drawImage(img_titre_jeu, 300, 100, img_titre_jeu.width * 1.5, img_titre_jeu.height * 1.5);
+    let img_titre_fond = new Image();
+    img_titre_fond.src = './sprites/space_9.jpg';
+
+    context.drawImage(img_titre_fond, 0, -(img_titre_fond.height * 2 - cnv.height), img_titre_fond.width * 2, img_titre_fond.height * 2);
 
     for (let i = 0; i < poussiere_tab.length; i++) {
         context.beginPath();
@@ -1524,7 +1612,7 @@ function draw_ecran_titre() {
     }
 
     context.drawImage(Vaisseau_joueur, Joueur.x - 54, Joueur.y, Vaisseau_joueur.width * 0.1, Vaisseau_joueur.height * 0.1);
-
+    context.drawImage(img_titre_jeu, 300, 100, img_titre_jeu.width * 1.5, img_titre_jeu.height * 1.5);
 
     context.font = 'bold 50px Verdana, OCR A Std, serif';
     context.fillStyle = '#000';
@@ -1533,4 +1621,5 @@ function draw_ecran_titre() {
     context.fillText('PRESS ENTER TO PLAY',cnv.width/2-330,cnv.height/2+50);
     
 }
+// Lorsqu'on load la page, on lance direment l'écran titre du jeu.
 let affiche_ecran_titre_id = setInterval(draw_ecran_titre, 15);
