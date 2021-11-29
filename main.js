@@ -1,16 +1,10 @@
 let cnv = document.getElementById('myCanvas');
 let context = cnv.getContext('2d');
 
-//permet de modifier la taille du canvas pour s'ajuster à l'écran de l'utilisateur
 window.addEventListener('resize', resizeCanvas, false);
 function resizeCanvas() {
         cnv.width = window.innerWidth;
         cnv.height = window.innerHeight;
-
-        /**
-         * Your drawings need to be inside this function otherwise they will be reset when 
-         * you resize the browser window and the canvas goes will be cleared.
-         */
 }
 resizeCanvas();
 
@@ -176,9 +170,6 @@ class Game {
         this.level_id++;
         if (this.levels.length > this.level_id) {
             this.current_level = this.levels[this.level_id];
-            Fond_space_1_i1.src = game.current_level.img;
-            coord_fond_1 = [0, -(Fond_space_1_i1.height * size - cnv.height)];
-            coord_fond_2 = [0, -(Fond_space_1_i1.height * size - cnv.height) - Fond_space_1_i1.height * size];
         } else {
             this.finished = true;
              console.log("perdu t'es nul lol mdr");
@@ -296,71 +287,71 @@ function spawn_bonus(type) {
 
 // Class wave qui gère le déroulement d'une wave, avec : 
 //
-// Nombre d'enemie dans la wave
-// Tabeau des enemies 
-// Le nombre d'enemie differents.
-// Nombre d'enemie en vie
-// Nombre d'enemie mort
-// Nombre d'enemie Total
+// Nombre d'ennemie dans la wave
+// Tabeau des ennemies 
+// Le nombre d'ennemie differents.
+// Nombre d'ennemie en vie
+// Nombre d'ennemie mort
+// Nombre d'ennemie Total
 // Bouléan pour savoir si on la wave est finie.
 // Bouléan pour savoir si la wave à été commencée.
 //
-// Create_wave : Fait spawn les enemies aléatoirement en x en déhors du canvas, toutes les 1.5 secondes.
+// Create_wave : Fait spawn les ennemies aléatoirement en x en déhors du canvas, toutes les 1.5 secondes.
 
 class wave {
-    constructor(nb_enemie, tab_enemie) {
-        this.nb_enemies = nb_enemie;
-        this.enemie_tab = tab_enemie;
-        this.nb_of_enemie = tab_enemie.length;
-        this.enemie_en_vie = 0;
-        this.enemie_mort = 0;
-        this.enemie_total = nb_enemie;
+    constructor(nb_ennemie, tab_ennemie) {
+        this.nb_ennemies = nb_ennemie;
+        this.ennemie_tab = tab_ennemie;
+        this.nb_of_ennemie = tab_ennemie.length;
+        this.ennemie_en_vie = 0;
+        this.ennemie_mort = 0;
+        this.ennemie_total = nb_ennemie;
         this.wave_end = false;
         this.HasSpawn = false;
     }
 
     create_wave() {
-        let enemie_restant_a_spawner = this.enemie_total;
+        let ennemie_restant_a_spawner = this.ennemie_total;
 
-        let tab = this.enemie_tab;
+        let tab = this.ennemie_tab;
 
         let spawninterval = setInterval(
             function() {
-                if (enemie_restant_a_spawner <= 0) {
+                if (ennemie_restant_a_spawner <= 0) {
                     clearInterval(spawninterval);
                     game.current_level.current_wave.wave_end = true;
                     spawninterval = null;
                 } else {
-                    let nb_enemie_a_spawn = Math.floor(Math.random() * 3) + 3;
+                    let nb_ennemie_a_spawn = Math.floor(Math.random() * 3) + 3;
 
-                    if ((enemie_restant_a_spawner - nb_enemie_a_spawn) < 0) {
-                        nb_enemie_a_spawn = enemie_restant_a_spawner;
+                    if ((ennemie_restant_a_spawner - nb_ennemie_a_spawn) < 0) {
+                        nb_ennemie_a_spawn = ennemie_restant_a_spawner;
                     }
 
 
 
-                    let type_enemie = Math.floor(Math.random() * game.current_level.current_wave.nb_of_enemie);
+                    let type_ennemie = Math.floor(Math.random() * game.current_level.current_wave.nb_of_ennemie);
 
-                    let enemie_a_spawn = tab[type_enemie];
+                    let ennemie_a_spawn = tab[type_ennemie];
 
-                    if (enemie_a_spawn == enemie_5) {
-                        nb_enemie_a_spawn = 1;
+                    if (ennemie_a_spawn == ennemie_5) {
+                        nb_ennemie_a_spawn = 1;
                     }
 
-                    enemie_restant_a_spawner -= nb_enemie_a_spawn;
+                    ennemie_restant_a_spawner -= nb_ennemie_a_spawn;
 
                     let y_ = -300;
                     let x_ = Math.floor(Math.random() * (cnv.width - 500));
 
-                    for (let i = 0; i < nb_enemie_a_spawn; i++) {
-                        let x__ = x_ + (100 * i * (enemie_a_spawn.size * 10));
+                    for (let i = 0; i < nb_ennemie_a_spawn; i++) {
+                        let x__ = x_ + (100 * i * (ennemie_a_spawn.size * 10));
 
-                        let enemie_1 = new Enemy(x__, y_, x__, y_, enemie_a_spawn.vit, enemie_a_spawn.type, enemie_a_spawn.vie, enemie_a_spawn.img, enemie_a_spawn.projectile, enemie_a_spawn.size, enemie_a_spawn.proj_type);
+                        let ennemie_1 = new Enemy(x__, y_, x__, y_, ennemie_a_spawn.vit, ennemie_a_spawn.type, ennemie_a_spawn.vie, ennemie_a_spawn.img, ennemie_a_spawn.projectile, ennemie_a_spawn.size, ennemie_a_spawn.proj_type);
 
-                        game.current_level.current_wave.enemie_en_vie++;
+                        game.current_level.current_wave.ennemie_en_vie++;
 
-                        //enemie_1.shoot_enemi();
-                        List_Enemy.append(enemie_1);
+                        //ennemie_1.shoot_enemi();
+                        List_Enemy.append(ennemie_1);
 
                     }
                 }
@@ -375,17 +366,17 @@ class wave {
 // Coordonnées
 // Coordonnées relative
 // vitesse selon x et y
-// Type de l'enemie,
+// Type de l'ennemie,
 // Vie
 // Sprite
-// Un tableau avec les 4 points de collisions de l'enemie calculé à partir de ses coordonnées x,y
+// Un tableau avec les 4 points de collisions de l'ennemie calculé à partir de ses coordonnées x,y
 // Le projectile qu'il tir
 // Taille
 // Type qui sert à determiné si il tir 1 ou plusieur projectil à la fois.
 // Iterateur qui sert à déterminé quand est ce qu'il va tirer son projectile.
 //
-// draw_collisions : Dessine la collision de l'enemie, sert uniquement pour le débug.
-// shoot_enemie : Ici on test la variable proj_type, pour savoir quel fonction de tir on va choisir.
+// draw_collisions : Dessine la collision de l'ennemie, sert uniquement pour le débug.
+// shoot_ennemie : Ici on test la variable proj_type, pour savoir quel fonction de tir on va choisir.
 // Iteration_shoot : Permet de calculer en fonction de l'update global quand est ce qu'il tir.
 class Enemy {
     constructor(x, y, x_aux, y_aux, vit, type, vie, img, projectile_, size, pjts) {
@@ -431,23 +422,23 @@ class Enemy {
                 break;
             case 1:
                 tir_2.play();
-                enemie_shoot_simple(this, this.projectile);
+                ennemie_shoot_simple(this, this.projectile);
                 break;
             case 2:
                 tir_2.play();
-                enemie_shoot_double(this, this.projectile);
+                ennemie_shoot_double(this, this.projectile);
                 break;
             case 3:
                 tir_2.play();
-                enemie_shoot_triple(this, this.projectile);
+                ennemie_shoot_triple(this, this.projectile);
                 break;
             case 4:
 
-                enemie_shoot_arc_cercle(this, this.projectile, 1);
-                //enemie_shoot_arc_cercle(this,this.projectile,-1);
+                ennemie_shoot_arc_cercle(this, this.projectile, 1);
+                //ennemie_shoot_arc_cercle(this,this.projectile,-1);
                 break;
             case 5:
-                enemie_shoot_arc_cercle(this, this.projectile, -1);
+                ennemie_shoot_arc_cercle(this, this.projectile, -1);
                 break;
             
         }
@@ -480,33 +471,33 @@ class decors {
         this.vy = vy;
     }
 }
-// Fonction utilisé par shoot_enemie (vu plus haut)
+// Fonction utilisé par shoot_ennemie (vu plus haut)
 // tir un projectile
-function enemie_shoot_simple(enemie, projec) {
+function ennemie_shoot_simple(ennemie, projec) {
     let proj_cp = projec;
-    let proj = new projectile(enemie.x, enemie.y, proj_cp.vx, proj_cp.vy, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
+    let proj = new projectile(ennemie.x, ennemie.y, proj_cp.vx, proj_cp.vy, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
     List_projectile_Enemy.append(proj);
 }
 // Tir deux projectiles
-function enemie_shoot_double(enemie, projec) {
+function ennemie_shoot_double(ennemie, projec) {
     let proj_cp = projec;
-    let proj_1 = new projectile(enemie.x - (100 * enemie.size), enemie.y, proj_cp.vx, proj_cp.vy, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
-    let proj_2 = new projectile(enemie.x + (100 * enemie.size), enemie.y, proj_cp.vx, proj_cp.vy, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
+    let proj_1 = new projectile(ennemie.x - (100 * ennemie.size), ennemie.y, proj_cp.vx, proj_cp.vy, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
+    let proj_2 = new projectile(ennemie.x + (100 * ennemie.size), ennemie.y, proj_cp.vx, proj_cp.vy, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
     List_projectile_Enemy.append(proj_1);
     List_projectile_Enemy.append(proj_2);
 }
 // TIr trois projectiles
-function enemie_shoot_triple(enemie, projec) {
+function ennemie_shoot_triple(ennemie, projec) {
     let proj_cp = projec;
-    let proj_1 = new projectile(enemie.x - (150 * enemie.size), enemie.y, proj_cp.vx, proj_cp.vy, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
-    let proj_2 = new projectile(enemie.x, enemie.y + (100 * enemie.size), proj_cp.vx, proj_cp.vy, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
-    let proj_3 = new projectile(enemie.x + (150 * enemie.size), enemie.y, proj_cp.vx, proj_cp.vy, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
+    let proj_1 = new projectile(ennemie.x - (150 * ennemie.size), ennemie.y, proj_cp.vx, proj_cp.vy, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
+    let proj_2 = new projectile(ennemie.x, ennemie.y + (100 * ennemie.size), proj_cp.vx, proj_cp.vy, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
+    let proj_3 = new projectile(ennemie.x + (150 * ennemie.size), ennemie.y, proj_cp.vx, proj_cp.vy, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
     List_projectile_Enemy.append(proj_1);
     List_projectile_Enemy.append(proj_2);
     List_projectile_Enemy.append(proj_3);
 }
 // Tir 15 projectiles en cercle.
-function enemie_shoot_arc_cercle(enemie, projec, sens) {
+function ennemie_shoot_arc_cercle(ennemie, projec, sens) {
 
     let proj_cp = projec;
     let nb_a_shooter = 0;
@@ -517,7 +508,7 @@ function enemie_shoot_arc_cercle(enemie, projec, sens) {
     tir_5.play();
     let shoot_in_circle = setInterval(
         function() {
-            if (nb_a_shooter >= 15 || enemie.vie <= 0) {
+            if (nb_a_shooter >= 15 || ennemie.vie <= 0) {
                 clearInterval(shoot_in_circle);
                 shoot_in_circle = null;
                 tir_5.pause();
@@ -527,13 +518,13 @@ function enemie_shoot_arc_cercle(enemie, projec, sens) {
                 let vx_ = vitesse * Math.cos(angle * sens);
                 let vy_ = vitesse * Math.sin(angle);
                 nb_a_shooter++;
-                let proj_1 = new projectile(enemie.x + 50, enemie.y + 50, vx_, vy_, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
+                let proj_1 = new projectile(ennemie.x + 50, ennemie.y + 50, vx_, vy_, proj_cp.src, proj_cp.degats, proj_cp.freq, proj_cp.size);
                 List_projectile_Enemy.append(proj_1);
 
             }
         }, 100);
 }
-// Function qui sert à la classe enemie, on itère sur chaque enemie, le temps qu'il lui reste à attendre pour tirer à partir de la fonction globale update.
+// Function qui sert à la classe ennemie, on itère sur chaque ennemie, le temps qu'il lui reste à attendre pour tirer à partir de la fonction globale update.
 function iteration_enemi_shoot(liste) {
     let current = liste.get_head();
 
@@ -694,25 +685,25 @@ const List_Bonus = new LinkedListFactory();
 
 // Objets préfabriqués
 
-// Projectiles des enemies : 
-let projectile_1_enemie = new projectile(0, 0, 0, 28, './sprites/beams_green.png', 20, 3000, 1);
-let projectile_2_enemie = new projectile(0, 0, 0, 30, './sprites/beams_red.png', 40, 1500, 1);
-let projectile_3_enemie = new projectile(0, 0, 0, 28, './sprites/beams_blue_ball.png', 50, 3000, 2);
-let projectile_4_enemie = new projectile(0, 0, 0, 23, './sprites/beams_red.png', 100, 4500, 2);
-let projectile_5_enemie = new projectile(0, 0, 0, 23, './sprites/beams_blue.png', 15, 4500, 1.5);
+// Projectiles des ennemies : 
+let projectile_1_ennemie = new projectile(0, 0, 0, 28, './sprites/beams_green.png', 20, 3000, 1);
+let projectile_2_ennemie = new projectile(0, 0, 0, 30, './sprites/beams_red.png', 40, 1500, 1);
+let projectile_3_ennemie = new projectile(0, 0, 0, 28, './sprites/beams_blue_ball.png', 50, 3000, 2);
+let projectile_4_ennemie = new projectile(0, 0, 0, 23, './sprites/beams_red.png', 100, 4500, 2);
+let projectile_5_ennemie = new projectile(0, 0, 0, 23, './sprites/beams_blue.png', 15, 4500, 1.5);
 
 // Projectiles du joueur : 
 let projectile_1_joueur = new projectile(0, 0, 0, -18, './sprites/beams_blue.png', 50, 400, 1.5);
 let projectile_2_joueur = new projectile(0, 0, 0, -36, './sprites/beams_red.png', 100, 700, 1);
 
 // Enemies : 
-let enemie_1 = new Enemy(0, 0, 0, 0, 1.5, 'Normal', 50, './sprites/Enemy_n_2.png', projectile_1_enemie, 0.075, 1);
-let enemie_2 = new Enemy(0, 0, 0, 0, 3.5, 'Normal', 20, './sprites/Enemy_n_1.png', projectile_2_enemie, 0.075, 1);
-let enemie_3 = new Enemy(0, 0, 0, 0, 2, 'Normal', 200, './sprites/Enemy_n_1.png', projectile_3_enemie, 0.15, 1);
-let enemie_4 = new Enemy(0, 0, 0, 0, 1, 'Normal', 400, './sprites/Enemy_n_2.png', projectile_4_enemie, 0.22, 1);
-let enemie_5 = new Enemy(0, 0, 0, 0, 1, 'Normal', 800, './sprites/Enemy_n_2.png', projectile_5_enemie, 0.22, 4);
-let enemie_6 = new Enemy(0, 0, 0, 0, 5, 'Tourne', 100, './sprites/Enemy_r_1.png', null, 0.075, 0);
-let enemie_7 = new Enemy(0, 0, 0, 0, 4, 'Tourne', 150, './sprites/Enemy_r_2.png', null, 0.15, 0);
+let ennemie_1 = new Enemy(0, 0, 0, 0, 1.5, 'Normal', 50, './sprites/Enemy_n_2.png', projectile_1_ennemie, 0.075, 1);
+let ennemie_2 = new Enemy(0, 0, 0, 0, 3.5, 'Normal', 20, './sprites/Enemy_n_1.png', projectile_2_ennemie, 0.075, 1);
+let ennemie_3 = new Enemy(0, 0, 0, 0, 2, 'Normal', 200, './sprites/Enemy_n_1.png', projectile_3_ennemie, 0.15, 1);
+let ennemie_4 = new Enemy(0, 0, 0, 0, 1, 'Normal', 400, './sprites/Enemy_n_2.png', projectile_4_ennemie, 0.22, 1);
+let ennemie_5 = new Enemy(0, 0, 0, 0, 1, 'Normal', 800, './sprites/Enemy_n_2.png', projectile_5_ennemie, 0.22, 4);
+let ennemie_6 = new Enemy(0, 0, 0, 0, 5, 'Tourne', 100, './sprites/Enemy_r_1.png', null, 0.075, 0);
+let ennemie_7 = new Enemy(0, 0, 0, 0, 4, 'Tourne', 150, './sprites/Enemy_r_2.png', null, 0.15, 0);
 
 
 // Variable globales : 
@@ -728,7 +719,8 @@ let bout_trainée = [0, 0];
 var lvl_canon = 5;
 let type_canon = 2;
 let frequence_tir_joueur = 1000;
-let Joueur = new Player(cnv.width / 2 - 50, cnv.height- 150, 9000); //x,y,vie
+
+let Joueur = new Player(cnv.width / 2 - 50, cnv.height- 150, 10000); //x,y,vie
 let tab_decors_plan_1 = [];
 let tab_decors_plan_2 = [];
 let tab_decors_plan_3 = [];
@@ -784,11 +776,11 @@ function init_decors_(tab_decors, decors_sprites, n) {
     }
 }
 
-// Fonction qui sert à chercher les enemies que le joueur doit détruire, 
+// Fonction qui sert à chercher les ennemies que le joueur doit détruire, 
 //
-// Il se déplace en fonction des enemies les plus bas,
-// Si un enemies est trop bas il ne cherchera plus à le détruire et le laissera passer.
-function joueur_cherche_enemie() {
+// Il se déplace en fonction des ennemies les plus bas,
+// Si un ennemies est trop bas il ne cherchera plus à le détruire et le laissera passer.
+function joueur_cherche_ennemie() {
 
     let x_joueur = Joueur.x;
     let y_joueur = Joueur.y;
@@ -796,29 +788,29 @@ function joueur_cherche_enemie() {
 
     let y_enemi_pb = 0;
 
-    let enemie_a_trouve = null;
+    let ennemie_a_trouve = null;
     while (current) {
         let y_enemi = current.element.y;
         if (y_enemi > y_enemi_pb && y_joueur - 250 > y_enemi) {
             y_enemi_pb = y_enemi;
-            enemie_a_trouve = current.element;
+            ennemie_a_trouve = current.element;
         }
         current = current.next;
     }
 
-    if (enemie_a_trouve == null && setinterval_space_id) {
+    if (ennemie_a_trouve == null && setinterval_space_id) {
         joueur_tir();
-    } else if (enemie_a_trouve && setinterval_space_id == null) {
+    } else if (ennemie_a_trouve && setinterval_space_id == null) {
         joueur_tir();
     }
 
 
 
-    if (enemie_a_trouve) {
-        if (x_joueur > enemie_a_trouve.x) {
+    if (ennemie_a_trouve) {
+        if (x_joueur > ennemie_a_trouve.x) {
             dash_left();
         }
-        if (x_joueur < enemie_a_trouve.x) {
+        if (x_joueur < ennemie_a_trouve.x) {
             dash_right();
         }
     }
@@ -826,14 +818,14 @@ function joueur_cherche_enemie() {
 
 }
 
-// Fonction testant la vie d'un enemie. Si sa vie est infèrieur à 0, on le détruit et actualise les informations sur la wave courrante.
+// Fonction testant la vie d'un ennemie. Si sa vie est infèrieur à 0, on le détruit et actualise les informations sur la wave courrante.
 function test_vie(liste, element) {
     var explo_1 = document.createElement("audio");
     explo_1.src = "./Mp3/explo_1.mp3";
     if (element.vie <= 0) {
 
-        game.current_level.current_wave.enemie_en_vie--;
-        game.current_level.current_wave.enemie_mort++;
+        game.current_level.current_wave.ennemie_en_vie--;
+        game.current_level.current_wave.ennemie_mort++;
         explo_1.play();
         //console.log("En vie : ",Enemis_Vivant,"Mort : ",Enemis_mort,"Total : ", Total_enemis);
         liste.remove(element);
@@ -865,7 +857,7 @@ function affiche_projectile(liste) {
 }
 var ang = 0
 
-// Fonction qui affiche les enemies.
+// Fonction qui affiche les ennemies.
 function affiche_enemy(liste) {
 
     let current = liste.get_head();
@@ -923,7 +915,7 @@ function update_pos_projectiles(liste) {
         current = current.next;
     }
 }
-// Fonction qui actualise les positions des enemies en fonction de leurs coordonnées et de leurs vitesse en x et en y, et en même actualise leurs points de collisions
+// Fonction qui actualise les positions des ennemies en fonction de leurs coordonnées et de leurs vitesse en x et en y, et en même actualise leurs points de collisions
 function update_pos_enemy_normaux(liste) {
     let current = liste.get_head();
 
@@ -971,8 +963,8 @@ function update_pos_enemy_normaux(liste) {
         current = current.next;
 
         if (current_a_détruire.element.y >= cnv.height) {
-            game.current_level.current_wave.enemie_en_vie--;
-            game.current_level.current_wave.enemie_mort++;
+            game.current_level.current_wave.ennemie_en_vie--;
+            game.current_level.current_wave.ennemie_mort++;
             liste.remove(current_a_détruire.element);
             //current_a_détruire = null;
         }
@@ -996,7 +988,7 @@ function update_pos_bonus(liste) {
     }
 }
 // Fonction qui test pour chaque projectiles si il collisionne un autre objets
-// Un projectile n'a comme surface de collision qu'un points, mais le joueur et les enemies, on un tableau de 4 points qui créent une surface de collisions.
+// Un projectile n'a comme surface de collision qu'un points, mais le joueur et les ennemies, on un tableau de 4 points qui créent une surface de collisions.
 // Ici on test donc un point : le projectile, et un tableau de points avec la fonction IsIn().
 function test_collision_projectiles(liste_colliders, liste_collided) {
     let current_Lpj = liste_colliders.get_head(); //liste projectile joueur
@@ -1037,9 +1029,9 @@ function test_collision_joueur(liste) {
         current_Lpe = current_Lpe.next;
     }
 }
-// Ici on test pour tous les enemies du type 'Tourne' si il touche le joueur.
-// Donc Pour chaque points de la surface d'un enemie on test si il se trouve dans la surface de collisions du joueur. et on itère sur les 3 autres points de l'enemie.
-function test_collision_enemie_joueur(liste) {
+// Ici on test pour tous les ennemies du type 'Tourne' si il touche le joueur.
+// Donc Pour chaque points de la surface d'un ennemie on test si il se trouve dans la surface de collisions du joueur. et on itère sur les 3 autres points de l'ennemie.
+function test_collision_ennemie_joueur(liste) {
     let current_Lpe = liste.get_head();
     let tableau_a_test = Joueur.face_collision;
 
@@ -1050,15 +1042,17 @@ function test_collision_enemie_joueur(liste) {
                 if (isIn(point_a_test, tableau_a_test)) {
                     Joueur.vie -= 20;
                     joueur_test_vie();
-                    game.current_level.current_wave.enemie_en_vie--;
-                    game.current_level.current_wave.enemie_mort++;
+                    game.current_level.current_wave.ennemie_en_vie--;
+                    game.current_level.current_wave.ennemie_mort++;
                     liste.remove(current_Lpe.element);
                 }
             }
         }
         current_Lpe = current_Lpe.next;
     }
+
 }
+
 for (let i = 0; i < nb_poussière; i++) {
     let poussiere = [0, 0, 0];
     if (i % 2 == 0) {
@@ -1134,8 +1128,8 @@ function draw() {
         game.current_level.affiche_img_lvl();
     }
 }
-// Fonction qui actualise les coordonnées de l'image de fond, des poussières, des elements de décors, des enemies, et des projectiles.
-function upgrade_pos() {
+// Fonction qui actualise les coordonnées de l'image de fond, des poussières, des elements de décors, des ennemies, et des projectiles.
+function update_pos() {
 
     let size = game.current_level.size;
     if (coord_fond_1[1] >= cnv.height) {
@@ -1494,13 +1488,13 @@ function PlayerShooting() {
 
 function update() {
     draw();
-    upgrade_pos();
+    update_pos();
     affiche_info_joueur();
 }
 function update2() {
     test_collision_projectiles(List_projectile_joueur, List_Enemy);
     test_collision_joueur(List_projectile_Enemy);
-    test_collision_enemie_joueur(List_Enemy);
+    test_collision_ennemie_joueur(List_Enemy);
     
 }
 
@@ -1520,16 +1514,16 @@ function start_game() {
     setinterval_global_update_id = setInterval(update, 15);
     setinterval_global_update_2_id = setInterval(update2, 30);
     setinterval_global_update_3_id = setInterval(current, 500);
-    setinterval_global_update_4_id = setInterval(joueur_cherche_enemie, 100);
+    setinterval_global_update_4_id = setInterval(joueur_cherche_ennemie, 100);
     changement_arme();
     joueur_tir();
 }
 
-// Fonction Qui va tester toutes les n secondes si on doit passer à la wave suivante ou au niveau suivant, en fonction des enemies vivant, mort, et totaux de la wave en cours.
+// Fonction Qui va tester toutes les n secondes si on doit passer à la wave suivante ou au niveau suivant, en fonction des ennemies vivant, mort, et totaux de la wave en cours.
 function current() {
-    let e_t = game.current_level.current_wave.enemie_total;
-    let e_m = game.current_level.current_wave.enemie_mort;
-    let e_v = game.current_level.current_wave.enemie_en_vie;
+    let e_t = game.current_level.current_wave.ennemie_total;
+    let e_m = game.current_level.current_wave.ennemie_mort;
+    let e_v = game.current_level.current_wave.ennemie_en_vie;
 
     if (!game.current_level.current_wave.HasSpawn) {
         game.current_level.current_wave.create_wave();
@@ -1542,33 +1536,32 @@ function current() {
     if (game.current_level.finished) {
         game.next_level();
         Fond_space_1_i1.src = game.current_level.img;
-        coord_fond_1 = [0, -(Fond_space_1_i1.height * size - cnv.height)];
-        coord_fond_2 = [0, -(Fond_space_1_i1.height * size - cnv.height) - Fond_space_1_i1.height * size];
+
     }
 }
 
 // Objets préfabriqué : 
 
 // Waves du level 1
-let wave1_1 = new wave(20, [enemie_1]);
-let wave2_1 = new wave(30, [enemie_1, enemie_2]);
-let wave3_1 = new wave(40, [enemie_2, enemie_3, enemie_4, enemie_5]);
-let wave4_1 = new wave(50, [enemie_5, enemie_4]);
+let wave1_1 = new wave(1, [ennemie_1]);
+let wave2_1 = new wave(1, [ennemie_1, ennemie_2]);
+let wave3_1 = new wave(1, [ennemie_2, ennemie_3, ennemie_4, ennemie_5]);
+let wave4_1 = new wave(1, [ennemie_5, ennemie_4]);
 
 // Création du level 1 avec un tableau de wave;
 let level_1 = new levels([wave1_1,wave2_1,wave3_1,wave4_1], './sprites/space_9.jpg', 2, './Image/lvl1.png');
 
-let wave1_2 = new wave(20, [enemie_1]);
-let wave2_2 = new wave(15, [enemie_1, enemie_2,enemie_6]);
-let wave3_2 = new wave(30, [enemie_1, enemie_3, enemie_4, enemie_5,enemie_6]);
-let wave4_2 = new wave(40, [enemie_1, enemie_2, enemie_4, enemie_5,enemie_6,enemie_7]);
+let wave1_2 = new wave(1, [ennemie_1]);
+let wave2_2 = new wave(1, [ennemie_1, ennemie_2,ennemie_6]);
+let wave3_2 = new wave(1, [ennemie_1, ennemie_3, ennemie_4, ennemie_5,ennemie_6]);
+let wave4_2 = new wave(1, [ennemie_1, ennemie_2, ennemie_4, ennemie_5,ennemie_6,ennemie_7]);
 
 let level_2 = new levels([wave1_2, wave2_2, wave3_2, wave4_2], './sprites/space_8.jpg', 2, './Image/lvl2.png');
 
-let wave1_3 = new wave(20, [enemie_1]);
-let wave2_3 = new wave(30, [enemie_1, enemie_2]);
-let wave3_3 = new wave(50, [enemie_1, enemie_3, enemie_4]);
-let wave4_3 = new wave(100, [enemie_1, enemie_2,enemie_3, enemie_4, enemie_5,enemie_6,enemie_7]);
+let wave1_3 = new wave(20, [ennemie_1]);
+let wave2_3 = new wave(30, [ennemie_1, ennemie_2]);
+let wave3_3 = new wave(50, [ennemie_1, ennemie_3, ennemie_4]);
+let wave4_3 = new wave(100, [ennemie_1, ennemie_2,ennemie_3, ennemie_4, ennemie_5,ennemie_6,ennemie_7]);
 
 let level_3 = new levels([wave1_3, wave2_3, wave3_3, wave4_3], './sprites/space_4.jpg', 2, './Image/lvl3.png');
 
